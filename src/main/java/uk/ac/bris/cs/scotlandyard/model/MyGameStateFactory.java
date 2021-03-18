@@ -81,7 +81,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
-			return null;
+			return Optional.empty();
 		}
 
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
