@@ -42,8 +42,33 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.mrX = mrX;
 			this.detectives = detectives;
 
-			// For checking parameters.
+			// checking part
+			// Check if the round is empty.
 			if (setup.rounds.isEmpty()) throw new IllegalArgumentException("Round is empty.");
+
+			// Check if Mr X value is empty/null.
+			if (mrX == null) throw new NullPointerException("Mr X is empty.");
+
+			// Check that Detectives are not empty.
+			if (detectives == null) throw new NullPointerException("Detectives are empty.");
+
+			// Check for 2 Mr X
+			for (Player detective : detectives) {
+				if (detective.isMrX()) throw new IllegalArgumentException("There's more than 1 Mr X.");
+			}
+
+			// Check for swapped Mr X
+			if (mrX.isDetective()) throw new IllegalArgumentException("Mr X is invalid");
+
+			// Check for Duplicate detectives
+			for (int i = 0; i < detectives.size(); i++){
+				for (int j = 0; j < detectives.size(); j++){
+					if(i != j){
+						if (detectives.get(i).equals(detectives.get(j))) throw new IllegalArgumentException("Duplicate detectives");
+					}
+				}
+			}
+
 		}
 
 
