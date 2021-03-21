@@ -58,11 +58,11 @@ public final class ImmutableBoard implements Board, Serializable {
 	}
 
 	public ImmutableBoard(GameSetup setup,
-	                      ImmutableMap<Detective, Integer> detectiveLocations,
-	                      ImmutableMap<Piece, ImmutableMap<Ticket, Integer>> tickets,
-	                      ImmutableList<LogEntry> mrXTravelLog,
-	                      ImmutableSet<Piece> winner,
-	                      ImmutableSet<Move> availableMoves) {
+						  ImmutableMap<Detective, Integer> detectiveLocations,
+						  ImmutableMap<Piece, ImmutableMap<Ticket, Integer>> tickets,
+						  ImmutableList<LogEntry> mrXTravelLog,
+						  ImmutableSet<Piece> winner,
+						  ImmutableSet<Move> availableMoves) {
 		this.setup = Objects.requireNonNull(setup);
 		this.detectiveLocations = Objects.requireNonNull(detectiveLocations);
 		this.tickets = Objects.requireNonNull(tickets);
