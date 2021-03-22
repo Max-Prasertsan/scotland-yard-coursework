@@ -5,9 +5,11 @@ import com.google.common.collect.ImmutableSet;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
-
+import uk.ac.bris.cs.scotlandyard.model.Move.*;
 import uk.ac.bris.cs.scotlandyard.model.Piece.*;
-
+import uk.ac.bris.cs.scotlandyard.model.Piece.*;
+import static uk.ac.bris.cs.scotlandyard.model.Piece.Detective.*;
+import static uk.ac.bris.cs.scotlandyard.model.Piece.MrX.MRX;
 import javax.annotation.Nonnull;
 
 /**
@@ -69,6 +71,35 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				}
 			}
 
+			// Check for Location Overlap between Detectives
+			for (int i = 0; i < detectives.size(); i++){
+				for (int j = 0; j < detectives.size(); j++){
+					if (i != j){
+						if(detectives.get(i).location()==detectives.get(j).location()) throw new IllegalArgumentException("Location Overlap between Detectives");
+					}
+				}
+			}
+
+			// Check if detectives have secret ticket
+			for (int i = 0; i < detectives.size(); i++) {
+				if (detectives.get(i).has(Ticket.SECRET))
+					throw new IllegalArgumentException("detectives have secret tickets");
+			}
+
+			//Check if the detective has a double move ticket
+			for (int i = 0; i < detectives.size(); i++) {
+				if (detectives.get(i).hasAtLeast(Ticket.DOUBLE,1))
+					throw new IllegalArgumentException("detective has a double move ticket");
+			}
+
+			//Check if the round is empty
+			if(setup.rounds.isEmpty()) throw new IllegalArgumentException("the round is empty");
+
+			//Check if the graph is empty
+			if(setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("the graph is empty");
+
+			//Check if The match supply works properly
+
 		}
 
 
@@ -105,3 +136,4 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 	}
 }
+
