@@ -69,9 +69,33 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				}
 			}
 
+			// Check if detective has secret ticket.
+			for (int i = 0; i < detectives.size(); i++){
+				if (detectives.get(i).has(Ticket.SECRET))
+					throw new IllegalArgumentException("Detective has secret ticket.");
+			}
+
+			// Check if detective has double ticket.
+			for (int i = 0; i < detectives.size(); i++){
+				if (detectives.get(i).hasAtLeast(Ticket.DOUBLE,1))
+					throw new IllegalArgumentException("Detective has double move ticket.");
+			}
+
+			// Check for empty graph
+			if (setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("The graph is empty");
 		}
+/**
+		private static ImmutableSet<SingleMove> makeSingleMoves(
+				GameSetup setup,
+				List<Player> detectives,
+				Player player,
+				int source){
+			final var singleMoves = new ArrayList<SingleMove>();
+			for (int destination : setup.graph.adjacentNodes(source)) {
 
-
+			}
+		}
+**/
 		@Override public GameSetup getSetup() {
 			return setup;
 		}
@@ -81,7 +105,17 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
-			return Optional.empty();
+			/**
+			for (int i = 0; i < detectives.size(); i++){
+				if (detective.isDetective()){
+					return Optional.of(detectives.location());
+				}
+				else{
+					Optional.empty();
+				}
+			}
+			 **/
+			return null;
 		}
 
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
