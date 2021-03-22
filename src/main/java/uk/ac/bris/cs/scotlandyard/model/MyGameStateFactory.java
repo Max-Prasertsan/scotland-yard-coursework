@@ -70,14 +70,14 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 
 			// Check if detective has secret ticket.
-			for (int i = 0; i < detectives.size(); i++){
-				if (detectives.get(i).has(Ticket.SECRET))
+			for (Player detective : detectives) {
+				if (detective.has(Ticket.SECRET))
 					throw new IllegalArgumentException("Detective has secret ticket.");
 			}
 
 			// Check if detective has double ticket.
-			for (int i = 0; i < detectives.size(); i++){
-				if (detectives.get(i).hasAtLeast(Ticket.DOUBLE,1))
+			for (Player detective : detectives) {
+				if (detective.hasAtLeast(Ticket.DOUBLE, 1))
 					throw new IllegalArgumentException("Detective has double move ticket.");
 			}
 
