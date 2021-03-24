@@ -1,5 +1,6 @@
 package uk.ac.bris.cs.scotlandyard.model;
 
+import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
@@ -99,7 +100,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			//Check if the graph is empty
 			if(setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("the graph is empty");
 
-			//Check if The match supply works properly
+			//Check if winner is empty at first
+			//if(!getWinner().isEmpty()) throw new IllegalArgumentException("Winner should be empty");
 
 		}
 
@@ -108,11 +110,29 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			return setup;
 		}
 
+		@Nonnull
 		@Override public ImmutableSet<Piece> getPlayers() {
+
+
+			List<Piece> all = new ArrayList<>();
+			for (Player detective : detectives){
+				all.add(detective.piece());
+			}
+
+			all.add(mrX.piece());
+
+			remaining = ImmutableSet.copyOf(all);
 			return remaining;
+
 		}
 
+		@Nonnull
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
+			for (Player d : detectives){
+				if (d.piece().isDetective()){
+					return Optional.of(d.location());
+				}
+			}
 			return Optional.empty();
 		}
 
