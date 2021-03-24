@@ -137,10 +137,16 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			return Optional.empty();
 		}
 
+		@Nonnull
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
-
+			/**
+			for (Piece : piece){
+				return Optional.of();
+			}
+			 **/
 			return Optional.empty();
 		}
+
 
 		@Nonnull
 		@Override public ImmutableList<LogEntry> getMrXTravelLog() {
