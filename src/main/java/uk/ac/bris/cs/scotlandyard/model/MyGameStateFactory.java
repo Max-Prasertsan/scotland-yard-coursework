@@ -144,6 +144,14 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 
 		@Override public ImmutableSet<Piece> getWinner() {
+
+			Set<Piece> prizeman = new LinkedHashSet<>();
+			winner = ImmutableSet.copyOf(prizeman);
+			// if (someone won){  // What's the definition of "win" this game...lol
+			// prizeman.add(someone)
+			// winner = ImmutableSet.copyOf(prizeman);
+			// }
+
 			return winner;
 		}
 
