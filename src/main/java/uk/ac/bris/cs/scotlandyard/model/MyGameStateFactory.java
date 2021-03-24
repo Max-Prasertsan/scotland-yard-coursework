@@ -21,11 +21,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 	}
 
 	private final class MyGameState implements GameState {
-		private GameSetup setup;
-		private ImmutableSet<Piece> remaining;
-		private ImmutableList<LogEntry> log;
+		private final GameSetup setup;
+		private final ImmutableSet<Piece> remaining;
+		private final ImmutableList<LogEntry> log;
 		private Player mrX;
-		private List<Player> detectives;
+		private final List<Player> detectives;
 		private ImmutableList<Player> everyone;
 		private ImmutableSet<Move> moves;
 		private ImmutableSet<Piece> winner;
@@ -64,11 +64,23 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int i = 0; i < detectives.size(); i++){
 				for (int j = 0; j < detectives.size(); j++){
 					if(i != j){
-						if (detectives.get(i).equals(detectives.get(j))) throw new IllegalArgumentException("Duplicate detectives");
+						if (detectives.get(i).equals(detectives.get(j))){
+							throw new IllegalArgumentException("Duplicate detectives");
+						}
 					}
 				}
 			}
 
+			// Check for overlapping location.
+			for (int i = 0; i < detectives.size(); i++){
+				for (int j = 0; j < detectives.size(); j++){
+					if(i != j){
+						if (detectives.get(i).location() == detectives.get(j).location()){
+							throw new IllegalArgumentException("Duplicate detectives");
+						}
+					}
+				}
+			}
 			// Check if detective has secret ticket.
 			for (Player detective : detectives) {
 				if (detective.has(Ticket.SECRET))
@@ -100,14 +112,22 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		}
 **/
+		@Nonnull
 		@Override public GameSetup getSetup() {
 			return setup;
 		}
 
+		@Nonnull
 		@Override public ImmutableSet<Piece> getPlayers() {
-			return remaining;
+			List<Piece> all = new ArrayList<>();
+			for (Player detective : detectives){
+				all.add(detective.piece());
+			}
+			all.add(mrX.piece());
+			return ImmutableSet.copyOf(all);
 		}
 
+		@Nonnull
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
 			for (Player d : detectives){
 				if (d.piece().isDetective()){
@@ -118,9 +138,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
+
 			return Optional.empty();
 		}
 
+		@Nonnull
 		@Override public ImmutableList<LogEntry> getMrXTravelLog() {
 			return log;
 		}
