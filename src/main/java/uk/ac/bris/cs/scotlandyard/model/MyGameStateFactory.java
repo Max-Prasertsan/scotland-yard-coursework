@@ -92,8 +92,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				int source){
 			final var singleMoves = new ArrayList<SingleMove>();
 			for (int destination : setup.graph.adjacentNodes(source)) {
+ 				for (Transport t : setup.graph.edgeValueOrDefault(source,destination,ImmutableSet.of())){
 
+ 				}
 			}
+ 			return ImmutableSet.copyOf(singleMoves);
+
 		}
 **/
 		@Override public GameSetup getSetup() {
@@ -105,17 +109,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
-			/**
-			for (int i = 0; i < detectives.size(); i++){
-				if (detective.isDetective()){
-					return Optional.of(detectives.location());
-				}
-				else{
-					Optional.empty();
+			for (Player d : detectives){
+				if (d.piece().isDetective()){
+					return Optional.of(d.location());
 				}
 			}
-			 **/
-			return null;
+			return Optional.empty();
 		}
 
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
