@@ -8,11 +8,10 @@ import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
 import uk.ac.bris.cs.scotlandyard.model.Move.*;
 import uk.ac.bris.cs.scotlandyard.model.Piece.*;
-
-import javax.annotation.Nonnull;
-
+import uk.ac.bris.cs.scotlandyard.model.Piece.*;
 import static uk.ac.bris.cs.scotlandyard.model.Piece.Detective.*;
 import static uk.ac.bris.cs.scotlandyard.model.Piece.MrX.MRX;
+import javax.annotation.Nonnull;
 
 /**
  * cw-model
