@@ -9,6 +9,8 @@ import java.util.*;
 import uk.ac.bris.cs.scotlandyard.model.Move.*;
 import uk.ac.bris.cs.scotlandyard.model.Piece.*;
 import uk.ac.bris.cs.scotlandyard.model.Piece.*;
+
+
 import static uk.ac.bris.cs.scotlandyard.model.Piece.Detective.*;
 import static uk.ac.bris.cs.scotlandyard.model.Piece.MrX.MRX;
 import javax.annotation.Nonnull;
@@ -99,8 +101,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			//Check if the graph is empty
 			if(setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("the graph is empty");
 
-			//Check if winner is empty at first
-			//if(!getWinner().isEmpty()) throw new IllegalArgumentException("Winner should be empty");
+
 
 		}
 
@@ -127,13 +128,24 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
-			for (Player d : detectives){
-				if (d.piece().isDetective()){
-					return Optional.of(d.location());
+			// For all detectives, if Detective#piece == detective,
+			// then return the location in an Optional.of();
+			// otherwise, return Optional.empty();
+			Optional<Integer> DetectiveAt = Optional.empty();
+			//if(!remaining.contains(detective)){ return DetectiveAt; }
+
+			for (Player d : detectives) {
+				if (d.piece() == detective) {
+					DetectiveAt = Optional.of(d.location());
+				} else {
+					DetectiveAt = Optional.empty();
 				}
+					return DetectiveAt;
 			}
+
 			return Optional.empty();
 		}
+
 
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
 			return Optional.empty();
