@@ -22,7 +22,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 	private final class MyGameState implements GameState {
 		private final GameSetup setup;
-		private final ImmutableSet<Piece> remaining;
+		private ImmutableSet<Piece> remaining;
 		private final ImmutableList<LogEntry> log;
 		private Player mrX;
 		private final List<Player> detectives;
@@ -124,7 +124,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				all.add(detective.piece());
 			}
 			all.add(mrX.piece());
-			return ImmutableSet.copyOf(all);
+			remaining = ImmutableSet.copyOf(all);
+			return remaining;
 		}
 
 		@Nonnull
@@ -139,11 +140,13 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
-			/**
-			for (Piece : piece){
-				return Optional.of();
+			class Ticket implements TicketBoard{
+
+				@Override
+				public int getCount(@Nonnull ScotlandYard.Ticket ticket) {
+					return 0;
+				}
 			}
-			 **/
 			return Optional.empty();
 		}
 
