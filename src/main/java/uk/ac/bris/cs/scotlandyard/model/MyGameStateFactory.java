@@ -5,9 +5,8 @@ import com.google.common.collect.ImmutableSet;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
-
+import com.google.common.collect.ImmutableMap;
 import uk.ac.bris.cs.scotlandyard.model.Piece.*;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -20,11 +19,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		return new MyGameState(setup, ImmutableSet.of(MrX.MRX), ImmutableList.of(), mrX, detectives);
 	}
 
-	private final class MyGameState implements GameState {
+	private static final class MyGameState implements GameState {
 		private final GameSetup setup;
 		private ImmutableSet<Piece> remaining;
 		private final ImmutableList<LogEntry> log;
-		private Player mrX;
+		private final Player mrX;
 		private final List<Player> detectives;
 		private ImmutableList<Player> everyone;
 		private ImmutableSet<Move> moves;
@@ -130,12 +129,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
+			Optional<Integer> DetectiveAt = Optional.empty();
 			for (Player d : detectives){
-				if (d.piece().isDetective()){
-					return Optional.of(d.location());
-				}
+				if (d.piece() == detective) DetectiveAt = Optional.of(d.location());
 			}
-			return Optional.empty();
+			return DetectiveAt;
 		}
 
 		@Nonnull
@@ -156,10 +154,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			return log;
 		}
 
+		@Nonnull
 		@Override public ImmutableSet<Piece> getWinner() {
 			return winner;
 		}
 
+		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
 			return moves;
 		}
