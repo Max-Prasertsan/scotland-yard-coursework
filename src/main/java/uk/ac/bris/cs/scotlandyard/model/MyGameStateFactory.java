@@ -2,6 +2,7 @@ package uk.ac.bris.cs.scotlandyard.model;
 
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
@@ -135,20 +136,33 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			//if(!remaining.contains(detective)){ return DetectiveAt; }
 
 			for (Player d : detectives) {
-				if (d.piece() == detective) {
-					DetectiveAt = Optional.of(d.location());
-				} else {
-					DetectiveAt = Optional.empty();
-				}
-					return DetectiveAt;
+				if (d.piece() == detective) DetectiveAt = Optional.of(d.location());
 			}
 
-			return Optional.empty();
+			return DetectiveAt;
 		}
 
 
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
-			return Optional.empty();
+			/**
+			 * @param piece the player piece
+			 * @return the ticket board of the given player; empty if the player is not part of the game
+			 */
+			/*
+			Board.TicketBoard ticketBoard = new TicketBoard() {
+				@Override
+				public int getCount(@Nonnull Ticket ticket) {
+					return 0;
+			};
+
+			for (Player d : detectives) {
+				if ()
+				return Optional.ofNullable();
+			}else {
+				return Optional.empty();
+			}
+			*/
+			return null;
 		}
 
 		@Override public ImmutableList<LogEntry> getMrXTravelLog() {
