@@ -36,6 +36,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private ImmutableSet<Move> moves;
 		private ImmutableSet<Piece> winner;
 
+
+
 		private MyGameState(
 				final GameSetup setup,
 				final ImmutableSet<Piece> remaining,
@@ -47,6 +49,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.log = log;
 			this.mrX = mrX;
 			this.detectives = detectives;
+
+			List<Player> e = new ArrayList<>();
+			e.add(mrX);
+			e.addAll(detectives);
+			everyone = ImmutableList.copyOf(e);
+
 
 			// checking part
 			// Check if the round is empty.
@@ -148,21 +156,39 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			 * @param piece the player piece
 			 * @return the ticket board of the given player; empty if the player is not part of the game
 			 */
-			/*
+			//Check that the piece given is a piece in the current game
+			if (!everyone.contains(piece)){
+				return Optional.empty();
+			}
+
+
+			class CreateTicketBoard implements TicketBoard {
+				@Override
+				public int getCount(@Nonnull Ticket ticket) {
+					//count ticket
+					return ticket.hashCode(); //?
+				}
+			}
+
 			Board.TicketBoard ticketBoard = new TicketBoard() {
 				@Override
 				public int getCount(@Nonnull Ticket ticket) {
 					return 0;
+					//?
+				}
 			};
 
-			for (Player d : detectives) {
-				if ()
-				return Optional.ofNullable();
-			}else {
-				return Optional.empty();
+
+			Optional<TicketBoard> op = Optional.empty();
+
+			for (Player i : everyone){
+				if(i.piece()==piece){
+					int value = ticketBoard.getCount(i.tickets());
+					op = Optional.of(value);
+				}
 			}
-			*/
-			return null;
+
+			return op;
 		}
 
 		@Override public ImmutableList<LogEntry> getMrXTravelLog() {
