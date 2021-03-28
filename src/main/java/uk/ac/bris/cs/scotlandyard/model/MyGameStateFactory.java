@@ -41,6 +41,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.mrX = mrX;
 			this.detectives = detectives;
 
+			List<Player> e = new ArrayList<>();
+			e.add(mrX);
+			e.addAll(detectives);
+			everyone = ImmutableList.copyOf(e);
+
 			// checking part
 			// Check if the round is empty.
 			if (setup.rounds.isEmpty()) throw new IllegalArgumentException("Round is empty.");
@@ -136,16 +141,26 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			return DetectiveAt;
 		}
 
+
+
+
 		@Nonnull
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
-			class Ticket implements TicketBoard{
+			class makeTicket implements TicketBoard{
 
 				@Override
-				public int getCount(@Nonnull ScotlandYard.Ticket ticket) {
-					return 0;
+				public int getCount(@Nonnull Ticket ticket) {
+					;
 				}
 			}
-			return Optional.empty();
+			Optional<ImmutableMap<Ticket, Integer>> lastTick = Optional.empty();
+			if (piece.isDetective()){
+				lastTick = Optional.of(ScotlandYard.defaultDetectiveTickets());
+			}
+			else {
+				lastTick = Optional.of(ScotlandYard.defaultMrXTickets());
+			}
+			return lastTick;
 		}
 
 
