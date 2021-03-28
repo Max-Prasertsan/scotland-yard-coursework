@@ -147,10 +147,17 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Nonnull
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
 			class makeTicket implements TicketBoard{
+				makeTicket(){
+					ImmutableMap.of(
+							Ticket.TAXI, 0,
+							Ticket.BUS, 0,
+							Ticket.UNDERGROUND, 0,
+							Ticket.DOUBLE, 0,
+							Ticket.SECRET, 0);
+				}
 
-				@Override
 				public int getCount(@Nonnull Ticket ticket) {
-					;
+					return 0;
 				}
 			}
 			Optional<ImmutableMap<Ticket, Integer>> lastTick = Optional.empty();
