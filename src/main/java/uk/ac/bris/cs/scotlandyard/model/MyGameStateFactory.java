@@ -110,9 +110,15 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				Player player,
 				int source){
 			final var singleMoves = new ArrayList<Move.SingleMove>();
+			Set<Integer> validMove = new HashSet<>();
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
+				for (Player d : detectives){
+					if (d.location() != destination){
+						singleMoves.add();
+					}
+				}
 
  				for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
 					// TO DO find out if the player has the required tickets
