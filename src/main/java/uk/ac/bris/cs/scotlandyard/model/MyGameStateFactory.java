@@ -25,7 +25,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private final ImmutableList<LogEntry> log;
 		private final Player mrX;
 		private final List<Player> detectives;
-		private ImmutableList<Player> everyone;
+		private final ImmutableList<Player> everyone;
 		private ImmutableSet<Move> moves;
 		private ImmutableSet<Piece> winner;
 
@@ -99,23 +99,33 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 			// Check for empty graph
 			if (setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("The graph is empty");
+
+			// Check if the winner is empty
+			//if (winner.isEmpty()) throw new IllegalArgumentException("The winner is empty");
 		}
-/**
-		private static ImmutableSet<SingleMove> makeSingleMoves(
+
+		private static ImmutableSet<Move.SingleMove> makeSingleMoves(
 				GameSetup setup,
 				List<Player> detectives,
 				Player player,
 				int source){
-			final var singleMoves = new ArrayList<SingleMove>();
+			final var singleMoves = new ArrayList<Move.SingleMove>();
 			for (int destination : setup.graph.adjacentNodes(source)) {
- 				for (Transport t : setup.graph.edgeValueOrDefault(source,destination,ImmutableSet.of())){
+				// TO DO find out if destination is occupied by a detective
+				// if the location is occupied, don't add to the list of moves to return
+
+ 				for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
+					// TO DO find out if the player has the required tickets
+					// if it does, construct SingleMove and add it the list of moves to return
 
  				}
+ 				// TO DO consider the rules of secret moves here
+				// add moves to the destination via a secret ticket if there are any left with the player
 			}
  			return ImmutableSet.copyOf(singleMoves);
 
 		}
-**/
+
 		@Nonnull
 		@Override public GameSetup getSetup() {
 			return setup;
@@ -140,8 +150,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			return DetectiveAt;
 		}
-
-
 
 
 		@Nonnull
