@@ -103,7 +103,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// Check if the winner is empty
 			//if (winner.isEmpty()) throw new IllegalArgumentException("The winner is empty");
 		}
-/**
+
 		private static ImmutableSet<Move.SingleMove> makeSingleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -112,14 +112,14 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			final var singleMoves = new ArrayList<Move.SingleMove>();
 			Set<Integer> validMove = new HashSet<>();
 
-			ArrayList<Integer> returnMove = new ArrayList<Integer>();
+			//ArrayList<Integer> returnMove = new ArrayList<Integer>();
 
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
 				for (Player d : detectives){
 					if (d.location() != destination){
-						returnMove.add(destination);
+						singleMoves.add(new Move.SingleMove(player.piece(), source, player.tickets(), destination));
 					}
 				}
 
@@ -132,11 +132,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
  				}
  				// TO DO consider the rules of secret moves here
 				// add moves to the destination via a secret ticket if there are any left with the player
-			}
- 			return ImmutableSet.copyOf(singleMoves);
-
+			return ImmutableSet.copyOf(singleMoves);
 		}
-**/
+
+
 		@Nonnull
 		@Override public GameSetup getSetup() {
 			return setup;
