@@ -111,16 +111,14 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				int source){
 			final var singleMoves = new ArrayList<Move.SingleMove>();
 
-			//ArrayList<Integer> returnMove = new ArrayList<Integer>();
-
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				boolean pass = false;
+				boolean repeat = false;
 				for (Player d : detectives){
 					if (d.location() == destination){
 						//singleMoves.add(new Move.SingleMove(player.piece(), source, player.tickets(), destination));
-						pass = true;
+						repeat = true;
 						break;
 					}
 				}
@@ -143,7 +141,63 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			return ImmutableSet.copyOf(singleMoves);
 		}
 
+		private static ImmutableSet<Move.DoubleMove> makeDoubleMoves(
+				GameSetup setup,
+				List<Player> detectives,
+				Player player,
+				int source){
+			final var doubleMoves = new ArrayList<Move.DoubleMove>();
+			Ticket ticket1 = null;
+			for (int destination : setup.graph.adjacentNodes(source)) {
+				// TO DO find out if destination is occupied by a detective
+				// if the location is occupied, don't add to the list of moves to return
+				boolean repeat = false;
+				for (Player d : detectives) {
+					if (d.location() == destination) {
+						//singleMoves.add(new Move.SingleMove(player.piece(), source, player.tickets(), destination));
+						repeat = true;
+						break;
+					}
+				}
 
+				for (Transport t1 : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
+					if (player.has(t1.requiredTicket())) {
+						ticket1 = t1.requiredTicket();
+					}
+				}
+
+				if (player.has(Ticket.SECRET)) {
+					for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
+						ticket1 = Ticket.SECRET;
+					}
+				}
+
+				for (int destination2 : setup.graph.adjacentNodes(destination)) {
+					// TO DO find out if destination is occupied by a detective
+					// if the location is occupied, don't add to the list of moves to return
+					for (Player d : detectives) {
+						if (d.location() == destination2) {
+							break;
+						}
+					}
+
+					for (Transport t2 : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
+						if (player.has(t2.requiredTicket())) {
+							assert ticket1 != null;
+							doubleMoves.add(new Move.DoubleMove(player.piece(), source, ticket1, destination, t2.requiredTicket(), destination2));
+						}
+					}
+
+					if (player.has(Ticket.SECRET)) {
+						for (Transport t2 : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
+							assert ticket1 != null;
+							doubleMoves.add(new Move.DoubleMove(player.piece(), source, ticket1, destination, Ticket.SECRET, destination2));
+						}
+					}
+				}
+			}
+			return ImmutableSet.copyOf(doubleMoves);
+		}
 
 		@Nonnull
 		@Override public GameSetup getSetup() {
