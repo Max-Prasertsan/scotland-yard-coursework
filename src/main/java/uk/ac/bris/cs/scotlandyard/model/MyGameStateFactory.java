@@ -230,6 +230,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
 			for (Player p : everyone){
 				if (p.piece() == piece){
+					//return Optional.of(ticket -> p.tickets().get(ticket));
+					// alternative option using lambda.
+
 					return Optional.of(new TicketBoard() {
 						@Override
 						public int getCount(@Nonnull Ticket ticket) {
@@ -254,6 +257,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
+
 			return moves;
 		}
 
