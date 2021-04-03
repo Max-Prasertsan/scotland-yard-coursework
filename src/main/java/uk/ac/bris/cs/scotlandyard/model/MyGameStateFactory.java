@@ -103,7 +103,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// Check if the winner is empty
 			//if (winner.isEmpty()) throw new IllegalArgumentException("The winner is empty");
 		}
-
+//--------------------------------------------------------------------------------------------------------------------------------------------
+		//helper for available move
 		private static ImmutableSet<Move.SingleMove> makeSingleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -140,7 +141,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			return ImmutableSet.copyOf(singleMoves);
 		}
-
+//-----------------------------------------------------------------------------------------------------------------------------------------
 		private static ImmutableSet<Move.DoubleMove> makeDoubleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -198,7 +199,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			return ImmutableSet.copyOf(doubleMoves);
 		}
-
+//-------------------------------------------------------------------------------------------------------------------------------------------------
 		@Nonnull
 		@Override public GameSetup getSetup() {
 			return setup;

@@ -25,6 +25,7 @@ public interface Board {
 		 */
 		int getCount(@Nonnull Ticket ticket);
 	}
+	
 
 	/**
 	 * @return the current game setup
