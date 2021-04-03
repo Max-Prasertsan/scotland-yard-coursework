@@ -115,33 +115,30 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				boolean repeat = false;
 				for (Player d : detectives){
 					if (d.location() == destination){
-						//singleMoves.add(new Move.SingleMove(player.piece(), source, player.tickets(), destination));
-						repeat = true;
 						break;
 					}
 				}
 
- 				for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
+				for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
 					// TO DO find out if the player has the required tickets
 					// if it does, construct SingleMove and add it the list of moves to return
 					if (player.has(t.requiredTicket())){
 						singleMoves.add(new Move.SingleMove(player.piece(), source, t.requiredTicket(), destination));
 					}
- 				}
- 				// TO DO consider the rules of secret moves here
+				}
+				// TO DO consider the rules of secret moves here
 				// add moves to the destination via a secret ticket if there are any left with the player
 				if (player.has(Ticket.SECRET)){
 					for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
-							singleMoves.add(new Move.SingleMove(player.piece(), source, Ticket.SECRET, destination));
+						singleMoves.add(new Move.SingleMove(player.piece(), source, Ticket.SECRET, destination));
 					}
 				}
 			}
 			return ImmutableSet.copyOf(singleMoves);
 		}
-//-----------------------------------------------------------------------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------------------------------------------------------------------
 		private static ImmutableSet<Move.DoubleMove> makeDoubleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -152,11 +149,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				boolean repeat = false;
 				for (Player d : detectives) {
 					if (d.location() == destination) {
-						//singleMoves.add(new Move.SingleMove(player.piece(), source, player.tickets(), destination));
-						repeat = true;
 						break;
 					}
 				}
@@ -257,7 +251,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
-
+			for (Player p : everyone){
+				//makeSingleMoves(setup, detectives, p, p.location());
+				//makeDoubleMoves(setup, detectives, p, p.location());
+			}
 			return moves;
 		}
 
