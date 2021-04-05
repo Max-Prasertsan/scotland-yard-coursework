@@ -115,27 +115,32 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				for (Player d : detectives){
-					if (d.location() == destination){
-						break;
-					}
-				}
-
-				for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
-					// TO DO find out if the player has the required tickets
-					// if it does, construct SingleMove and add it the list of moves to return
-					if (player.has(t.requiredTicket())){
-						singleMoves.add(new Move.SingleMove(player.piece(), source, t.requiredTicket(), destination));
-					}
-				}
-				// TO DO consider the rules of secret moves here
-				// add moves to the destination via a secret ticket if there are any left with the player
-				if (player.has(Ticket.SECRET)){
-					for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))){
-						singleMoves.add(new Move.SingleMove(player.piece(), source, Ticket.SECRET, destination));
+				for (Player d : detectives) {
+					if (d.location() != destination) {
+						for (Transport t : Objects.requireNonNull(
+								setup.graph.edgeValueOrDefault(
+										source,
+										destination,
+										ImmutableSet.of()))) {
+							// TO DO find out if the player has the required tickets
+							// if it does, construct SingleMove and add it the list of moves to return
+							if (player.has(t.requiredTicket())) {
+								singleMoves.add(new Move.SingleMove(
+										player.piece(),
+										source,
+										t.requiredTicket(),
+										destination));
+							}
+						}
+						// TO DO consider the rules of secret moves here
+						// add moves to the destination via a secret ticket if there are any left with the player
+						if (player.has(Ticket.SECRET)) {
+							singleMoves.add(new Move.SingleMove(player.piece(), source, Ticket.SECRET, destination));
+						}
 					}
 				}
 			}
+
 			return ImmutableSet.copyOf(singleMoves);
 		}
 		//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -150,43 +155,57 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
 				for (Player d : detectives) {
-					if (d.location() == destination) {
-						break;
-					}
-				}
+					if (d.location() != destination) {
+						for (Transport t1 : Objects.requireNonNull(
+								setup.graph.edgeValueOrDefault(
+										source,
+										destination,
+										ImmutableSet.of()))) {
 
-				for (Transport t1 : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
-					if (player.has(t1.requiredTicket())) {
-						ticket1 = t1.requiredTicket();
-					}
-				}
-
-				if (player.has(Ticket.SECRET)) {
-					for (Transport t : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
-						ticket1 = Ticket.SECRET;
-					}
-				}
-
-				for (int destination2 : setup.graph.adjacentNodes(destination)) {
-					// TO DO find out if destination is occupied by a detective
-					// if the location is occupied, don't add to the list of moves to return
-					for (Player d : detectives) {
-						if (d.location() == destination2) {
-							break;
+							if (player.has(t1.requiredTicket())) {
+								ticket1 = t1.requiredTicket();
+							}
 						}
-					}
 
-					for (Transport t2 : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
-						if (player.has(t2.requiredTicket())) {
-							assert ticket1 != null;
-							doubleMoves.add(new Move.DoubleMove(player.piece(), source, ticket1, destination, t2.requiredTicket(), destination2));
+						if (player.has(Ticket.SECRET)) {
+							ticket1 = Ticket.SECRET;
 						}
-					}
 
-					if (player.has(Ticket.SECRET)) {
-						for (Transport t2 : Objects.requireNonNull(setup.graph.edgeValueOrDefault(source, destination, ImmutableSet.of()))) {
-							assert ticket1 != null;
-							doubleMoves.add(new Move.DoubleMove(player.piece(), source, ticket1, destination, Ticket.SECRET, destination2));
+						for (int destination2 : setup.graph.adjacentNodes(destination)) {
+							// TO DO find out if destination is occupied by a detective
+							// if the location is occupied, don't add to the list of moves to return
+							for (Player d2 : detectives) {
+								if (d2.location() != destination2) {
+									for (Transport t2 : Objects.requireNonNull(
+											setup.graph.edgeValueOrDefault(
+													source,
+													destination,
+													ImmutableSet.of()))) {
+
+										if (player.has(t2.requiredTicket())) {
+											assert ticket1 != null;
+											doubleMoves.add(new Move.DoubleMove(
+													player.piece(),
+													source,
+													ticket1,
+													destination,
+													t2.requiredTicket(),
+													destination2));
+										}
+									}
+
+									if (player.has(Ticket.SECRET)) {
+										assert ticket1 != null;
+										doubleMoves.add(new Move.DoubleMove(
+												player.piece(),
+												source,
+												ticket1,
+												destination,
+												Ticket.SECRET,
+												destination2));
+									}
+								}
+							}
 						}
 					}
 				}
@@ -251,10 +270,19 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
-			for (Player p : everyone){
-				//makeSingleMoves(setup, detectives, p, p.location());
-				//makeDoubleMoves(setup, detectives, p, p.location());
+			Set<Move> merge_moves = new HashSet<>();
+			for (Player p : everyone) {
+				if (p.isMrX() && p.hasAtLeast(Ticket.DOUBLE, 1)) {
+					merge_moves = ImmutableSet.<Move>builder()
+							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location())))
+							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, p, p.location())))
+							.build();
+				}
+				else if (p.isMrX()){
+					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
+				}
 			}
+			moves = ImmutableSet.copyOf(merge_moves);
 			return moves;
 		}
 
