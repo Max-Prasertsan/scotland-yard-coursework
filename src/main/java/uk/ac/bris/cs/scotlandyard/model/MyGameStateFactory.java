@@ -281,6 +281,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				else if (p.isMrX()){
 					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
 				}
+
+				//if (p.isDetective()){
+				//	merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
+				//}
 			}
 			moves = ImmutableSet.copyOf(merge_moves);
 			return moves;
