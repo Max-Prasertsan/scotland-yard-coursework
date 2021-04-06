@@ -332,7 +332,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Override public ImmutableSet<Move> getAvailableMoves() {
 			Set<Move> merge_moves = new HashSet<>();
 			for (Player p : everyone) {
-				if (p.isMrX() && p.hasAtLeast(Ticket.DOUBLE, 1)) {
+				if (p.isMrX() && p.hasAtLeast(Ticket.DOUBLE, 1) && !setup.rounds.equals(ImmutableList.of(true))) {
 					merge_moves = ImmutableSet.<Move>builder()
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location())))
 							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, p, p.location())))
