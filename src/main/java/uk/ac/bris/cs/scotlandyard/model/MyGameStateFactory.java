@@ -111,7 +111,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private static ImmutableSet<Move.SingleMove> makeSingleDetectiveMoves(
 				GameSetup setup,
 				List<Player> detectives,
-				Player MRX,
+				Player player,
+				Player mrX,
 				int source){
 			final var singleMoves = new ArrayList<Move.SingleMove>();
 
@@ -119,8 +120,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
 
+				detectives.remove(player);
+
 				for (Player d : detectives) {
-					if (destination == MRX.location()){
+					if (d.location() == destination && d.location() == mrX.location()){
 						break;
 					}
 					for (Transport t : Objects.requireNonNull(
@@ -341,9 +344,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				else if (p.isMrX()){
 					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
 				}
-
-				//else if (p.isDetective()){
-				//	merge_moves = ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, p, p.location()));
+				//if (p.isDetective()){
+					//merge_moves = ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, p, mrX, p.location()));
 				//}
 			}
 			moves = ImmutableSet.copyOf(merge_moves);
@@ -351,6 +353,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		}
 
 		@Override public GameState advance(Move move) {
+			if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
+			// return gamestate after committing that move
+			// check potential problem -> throw illegal
 			return null;
 		}
 	}
