@@ -193,8 +193,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				Player player,
 				int source){
 			final var doubleMoves = new ArrayList<Move.DoubleMove>();
-			//ArrayList<Ticket> ticket1 = new ArrayList<>();
-			Ticket ticket1 = null;
 			for (int destination1 : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
@@ -242,7 +240,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 													Ticket.SECRET,
 													destination2));
 										}
-										else if (player.hasAtLeast(Ticket.SECRET, 2)){
+										if (player.hasAtLeast(Ticket.SECRET, 2)){
 											doubleMoves.add(new Move.DoubleMove(
 													player.piece(),
 													source,
