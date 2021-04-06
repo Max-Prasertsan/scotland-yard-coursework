@@ -216,13 +216,27 @@ public final class MyGameStateFactory implements Factory<GameState> {
 												destination2,
 												ImmutableSet.of()))) {
 									if(player.has(t1.requiredTicket()) && player.has(t2.requiredTicket())){
-										doubleMoves.add(new Move.DoubleMove(
-												player.piece(),
-												source,
-												t1.requiredTicket(),
-												destination1,
-												t2.requiredTicket(),
-												destination2));
+										if (t1.requiredTicket() == t2.requiredTicket()){
+											if (player.hasAtLeast(t1.requiredTicket(), 2)){
+												doubleMoves.add(new Move.DoubleMove(
+														player.piece(),
+														source,
+														t1.requiredTicket(),
+														destination1,
+														t2.requiredTicket(),
+														destination2));
+											}
+										}
+										else{
+											doubleMoves.add(new Move.DoubleMove(
+													player.piece(),
+													source,
+													t1.requiredTicket(),
+													destination1,
+													t2.requiredTicket(),
+													destination2));
+										}
+
 
 										if (player.hasAtLeast(Ticket.SECRET, 1)){
 											doubleMoves.add(new Move.DoubleMove(
