@@ -95,7 +95,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// Check if detectives have secret ticket
 			for (int i = 0; i < detectives.size(); i++) {
 				if (detectives.get(i).has(Ticket.SECRET))
-					throw new IllegalArgumentException("detectives have secret tickets");
+					throw new IllegalArgumentException("detectives have a secret ticket");
 			}
 
 			//Check if the detective has a double move ticket
@@ -123,16 +123,17 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private static ImmutableSet<Move.SingleMove> makeSingleDetectiveMoves(
 				GameSetup setup,
 				List<Player> detectives,
-				Player MRX,
+				Player player,
 				int source){
 			final var singleMoves = new ArrayList<Move.SingleMove>();
 
 			for (int destination : setup.graph.adjacentNodes(source)) {
-				// TO DO find out if destination is occupied by a detective
+				// TO DO find out if destination is occupied by other detectives
 				// if the location is occupied, don't add to the list of moves to return
+				detectives.remove(player);
 
 				for (Player d : detectives) {
-					if (destination == MRX.location()){
+					if (d.location() == destination){
 						break;
 					}
 					for (Transport t : Objects.requireNonNull(
@@ -142,9 +143,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 									ImmutableSet.of()))) {
 						// TO DO find out if the player has the required tickets
 						// if it does, construct SingleMove and add it the list of moves to return
-						if (d.has(t.requiredTicket())) {
+						if (player.has(t.requiredTicket())) {
 							singleMoves.add(new Move.SingleMove(
-									d.piece(),
+									player.piece(),
 									source,
 									t.requiredTicket(),
 									destination));
@@ -381,7 +382,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 
 		@Override public GameState advance(Move move) {
-			if(!moves.contains(move)) throw new IllegalArgumentException("Illegal move: "+move);
+			//if(!moves.contains(move)) throw new IllegalArgumentException("Illegal move: "+move);
 			return null;
 		}
 	}
