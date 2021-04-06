@@ -356,6 +356,35 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
 			// return gamestate after committing that move
 			// check potential problem -> throw illegal
+			// need to have a piece to check if move is being done
+			// remaining pieces
+			// entry list -> for MrX
+			// list of all player
+			// -add travel log to entry list
+			// -check if there is any move -> throw error
+			// -make a visit function -> below
+			// 		-check for destination -> in that visit, need to add for single move/double move
+			// check the original destination
+			// list of all destination -> check size, check if player MrX
+			// need to extract last element and put in second destination -> loop the destinations
+			// make copy of MrX
+			// 		for double move -> for 2 destinations
+			//		check if get to last ticket
+			//		counter to keep ticket
+			//		get the last ticket and break the loop
+			// check for the round
+			// reveal the ticket for MrX
+			// 		-> if have secret no reveal
+			// reveal last ticket for MrX
+			// need to add remaining player back to the 'everyone' list
+			// if player is not MrX -> go through the player list to check destination
+			//		copy of MrX give it ticket detectives
+			// 		loop other player and check if still in game -> add to remaining
+			//		add the remaining detective to the list then MrX
+			// - make a copy of remaining players and log entry list and return myGameState
+
+			// keep it clean
+
 			return null;
 		}
 	}
