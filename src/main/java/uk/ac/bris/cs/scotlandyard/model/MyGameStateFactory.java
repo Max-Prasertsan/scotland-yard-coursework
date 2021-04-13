@@ -37,7 +37,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private ImmutableSet<Piece> winner;
 
 
-
 		private MyGameState(
 				final GameSetup setup,
 				final ImmutableSet<Piece> remaining,
@@ -49,6 +48,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.log = log;
 			this.mrX = mrX;
 			this.detectives = detectives;
+
 
 			List<Player> e = new ArrayList<>();
 			e.add(mrX);
@@ -70,7 +70,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (Player detective : detectives) {
 				if (detective.isMrX()) throw new IllegalArgumentException("There's more than 1 Mr X.");
 			}
-
 			// Check for swapped Mr X
 			if (mrX.isDetective()) throw new IllegalArgumentException("Mr X is invalid");
 
@@ -116,6 +115,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 
 
+
 		//------------------------------------------------------------------------------------------------------------------------------------
 		//helper for available move
 		// DETECTIVES SINGLE MOVE
@@ -125,12 +125,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				List<Player> detectives,
 				Player player,
 				int source){
-			final var singleMoves = new ArrayList<Move.SingleMove>();
+			final var singleDetectiveMoves = new ArrayList<Move.SingleMove>();
 
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by other detectives
 				// if the location is occupied, don't add to the list of moves to return
-				detectives.remove(player);
+				//detectives.remove(player);
 
 				for (Player d : detectives) {
 					if (d.location() == destination){
@@ -144,7 +144,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// TO DO find out if the player has the required tickets
 						// if it does, construct SingleMove and add it the list of moves to return
 						if (player.has(t.requiredTicket())) {
-							singleMoves.add(new Move.SingleMove(
+							singleDetectiveMoves.add(new Move.SingleMove(
 									player.piece(),
 									source,
 									t.requiredTicket(),
@@ -154,7 +154,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				}
 			}
 
-			return ImmutableSet.copyOf(singleMoves);
+			return ImmutableSet.copyOf(singleDetectiveMoves);
 		}
 
 		//------------------------------------------------------------------------------------------------------------------------------
@@ -368,13 +368,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location())))
 							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, p, p.location())))
 							.build();
-				}
-				else if (p.isMrX()){
+				} else if (p.isMrX()){
 					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
-				}
-				else if (p.isDetective()){
+				} else if (p.isDetective()){
 					merge_moves = ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, p, p.location()));
 				}
+
 			}
 			moves = ImmutableSet.copyOf(merge_moves);
 			return moves;
@@ -382,8 +381,53 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 
 		@Override public GameState advance(Move move) {
-			//if(!moves.contains(move)) throw new IllegalArgumentException("Illegal move: "+move);
+			this.moves = getAvailableMoves();
+			if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
+			// return gamestate after committing that move
+			// check potential problem -> throw illegal
+			List<LogEntry> new_log = new ArrayList<>(log);
+			LogEntry new_entry = new LogEntry();
+			if(move.commencedBy().isMrX() && move.tickets().equals(Ticket.DOUBLE)){
+				this.log = new_log.add(move);
+			}else if(move.commencedBy().isMrX()){
+
+			}else if(move.commencedBy().isDetective()){
+
+			}
+
+
+			// need to have a piece to check if move is being done
+			// remaining pieces
+			// entry list -> for MrX
+			// list of all player
+			// -add travel log to entry list
+			// -check if there is any move -> throw error
+			// -make a visit function -> below
+			// 		-check for destination -> in that visit, need to add for single move/double move
+			// check the original destination
+			// list of all destination -> check size, check if player MrX
+			// need to extract last element and put in second destination -> loop the destinations
+			// make copy of MrX
+			// 		for double move -> for 2 destinations
+			//		check if get to last ticket
+			//		counter to keep ticket
+			//		get the last ticket and break the loop
+			// check for the round
+			// reveal the ticket for MrX
+			// 		-> if have secret no reveal
+			// reveal last ticket for MrX
+			// need to add remaining player back to the 'everyone' list
+			// if player is not MrX -> go through the player list to check destination
+			//		copy of MrX give it ticket detectives
+			// 		loop other player and check if still in game -> add to remaining
+			//		add the remaining detective to the list then MrX
+			// - make a copy of remaining players and log entry list and return myGameState
+
+			// keep it clean
+
 			return null;
+
+
 		}
 	}
 }
