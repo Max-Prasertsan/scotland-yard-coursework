@@ -367,7 +367,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// total used ticket is 1. Just update current position normally.
 						// make new ticket list to insert into new MrX.
 						// find the final destination of the move, add to current move.visit()
-						Player newMrX = new Player(mrX.piece(), mrX.tickets(), move.visit());
+						// need to implement visitor
+						Player newMrX = new Player(mrX.piece(), mrX.tickets(), current location);
 					}
 				}
 			}
@@ -377,9 +378,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					if (t.equals(Ticket.DOUBLE)) throw new IllegalArgumentException("Detective has double move");
 					else{
 						// subtract the used ticket out of detective tickets list
-						// update current location of the detective
+						// add the ticket to MrX
+						// change current location of the detective
 						// create new instant of that detective
-						// add to the remaining list.
+						// add to the 'remaining' list.
 					}
 				}
 
