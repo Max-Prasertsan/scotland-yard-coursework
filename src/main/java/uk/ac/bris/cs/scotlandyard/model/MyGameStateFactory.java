@@ -2,6 +2,7 @@ package uk.ac.bris.cs.scotlandyard.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.checkerframework.checker.units.qual.A;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
@@ -366,27 +367,38 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Nonnull
 		@Override public GameState advance(Move move) {
 			if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
-			ImmutableList<LogEntry> new_log = null;
+			Move.Visitor<Integer> findMoveLocation = new findMove();
+			// make copy of MrX
+			Player newMrX = mrX;
+			// copy of detective
+			ArrayList<Player> newDetectives = new ArrayList<>();
+			// left is the remaining player in the game
+			ArrayList<Piece> left = new ArrayList<>();
 
-			Move.Visitor findMove = new findMove();
 			// condition for Mr X
 			if (move.commencedBy().isMrX()){
+				/**
 				for (Ticket t : move.tickets()){
-					int current_location = 0;
 					if (t.equals(Ticket.DOUBLE)){
 						// the move is a double move
 						// need to handle 2 destinations
 						// get only the final location, but subtract 2 tickets used.
-						current_location = (int) move.visit(findMove);
+						mrX.use(Ticket.DOUBLE);
+
 					}
 					else{
 						// total used ticket is 1. Just update current position normally.
 						// make new ticket list to insert into new MrX.
 						// find the final destination of the move, add to current move.visit()
 						// need to implement visitor
-						current_location = (int) move.visit(findMove);
+						mrX.use(t);
 					}
-					Player newMrX = new Player(mrX.piece(), mrX.tickets(), current_location);
+				}
+				 **/
+				newMrX.use(move.tickets());
+				newMrX.at(move.visit(findMoveLocation));
+				if (!newMrX.tickets().isEmpty()){
+					left.add(newMrX.piece());
 				}
 			}
 			// condition for Detectives
@@ -399,14 +411,28 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// change current location of the detective
 						// create new instant of that detective
 						// add to the 'remaining' list.
+						for (Player d : detectives){
+							if (d.piece().equals(move.commencedBy())){
+								d.use(t);
+								newMrX.give(t);
+								d.at(move.visit(findMoveLocation));
+							}
+							if (!d.tickets().isEmpty()){
+								left.add(d.piece());
+								newDetectives.add(d);
+							}
+						}
 					}
+
 				}
 
 			}
 			// use the new updated version of either MrX or detectives
 			// change in remaining
 			// change in log, add the move that been made by MrX
-			return new MyGameState(setup, remaining, log, mrX, detectives);
+			ImmutableSet<Piece> newRemaining = ImmutableSet.copyOf(left);
+			ImmutableList<Player> remainingDetectives = ImmutableList.copyOf(newDetectives);
+			return new MyGameState(setup, newRemaining, log, newMrX, remainingDetectives);
 		}
 	}
 }
