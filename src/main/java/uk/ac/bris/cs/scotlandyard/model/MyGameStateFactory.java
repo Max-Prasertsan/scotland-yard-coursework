@@ -2,11 +2,10 @@ package uk.ac.bris.cs.scotlandyard.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.checkerframework.checker.units.qual.A;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
-import com.google.common.collect.ImmutableMap;
+
 import uk.ac.bris.cs.scotlandyard.model.Piece.*;
 import javax.annotation.Nonnull;
 
@@ -351,25 +350,43 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			moves = ImmutableSet.copyOf(merge_moves);
 			return moves;
 		}
+		//--------------------------------------------------------------------------------------------------------------
+		public static class findMove implements Move.Visitor {
+			@Override
+			public Object visit(Move.SingleMove move) {
+				return move.destination;
+			}
 
+			@Override
+			public Object visit(Move.DoubleMove move) {
+				return move.destination2;
+			}
+		}
+
+		@Nonnull
 		@Override public GameState advance(Move move) {
 			if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
 			ImmutableList<LogEntry> new_log = null;
+
+			Move.Visitor findMove = new findMove();
 			// condition for Mr X
 			if (move.commencedBy().isMrX()){
 				for (Ticket t : move.tickets()){
+					int current_location = 0;
 					if (t.equals(Ticket.DOUBLE)){
 						// the move is a double move
 						// need to handle 2 destinations
 						// get only the final location, but subtract 2 tickets used.
+						current_location = (int) move.visit(findMove);
 					}
 					else{
 						// total used ticket is 1. Just update current position normally.
 						// make new ticket list to insert into new MrX.
 						// find the final destination of the move, add to current move.visit()
 						// need to implement visitor
-						Player newMrX = new Player(mrX.piece(), mrX.tickets(), current location);
+						current_location = (int) move.visit(findMove);
 					}
+					Player newMrX = new Player(mrX.piece(), mrX.tickets(), current_location);
 				}
 			}
 			// condition for Detectives
