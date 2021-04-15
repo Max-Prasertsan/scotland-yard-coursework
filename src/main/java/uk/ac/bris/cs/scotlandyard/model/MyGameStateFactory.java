@@ -374,10 +374,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			ArrayList<Player> newDetectives = new ArrayList<>();
 			// left is the remaining player in the game
 			ArrayList<Piece> left = new ArrayList<>();
+			// Copy of log
+			ImmutableList<LogEntry> newLog = ImmutableList.copyOf(log);
 
 			// condition for Mr X
 			if (move.commencedBy().isMrX()){
-				/**
 				for (Ticket t : move.tickets()){
 					if (t.equals(Ticket.DOUBLE)){
 						// the move is a double move
@@ -393,13 +394,30 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// need to implement visitor
 						mrX.use(t);
 					}
+					for (LogEntry l : newLog){
+						switch (newLog.size()){
+							case 3:
+								l.hidden(t);
+							case 8:
+								l.hidden(t);
+							case 13:
+								l.hidden(t);
+							case 18:
+								l.hidden(t);
+							case 24:
+								l.hidden(t);
+						}
+					}
+
 				}
-				 **/
-				newMrX.use(move.tickets());
+
 				newMrX.at(move.visit(findMoveLocation));
+
 				if (!newMrX.tickets().isEmpty()){
 					left.add(newMrX.piece());
 				}
+
+
 			}
 			// condition for Detectives
 			else{
@@ -432,7 +450,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// change in log, add the move that been made by MrX
 			ImmutableSet<Piece> newRemaining = ImmutableSet.copyOf(left);
 			ImmutableList<Player> remainingDetectives = ImmutableList.copyOf(newDetectives);
-			return new MyGameState(setup, newRemaining, log, newMrX, remainingDetectives);
+
+			return new MyGameState(setup, newRemaining, newLog, newMrX, remainingDetectives);
 		}
 	}
 }
