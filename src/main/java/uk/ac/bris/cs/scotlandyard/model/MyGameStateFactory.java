@@ -325,9 +325,17 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Piece> getWinner() {
-			if (remaining.isEmpty()){
-				winner.isEmpty();
+			Set<Piece> prizeMan = new LinkedHashSet<>();
+			if (!remaining.isEmpty()){
+				if(!remaining.contains(mrX.piece())){
+					prizeMan.addAll(remaining);
+				}
+				else{
+					prizeMan.clear();
+				}
 			}
+
+			winner = ImmutableSet.copyOf(prizeMan);
 			return winner;
 		}
 
@@ -345,9 +353,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
 				}
 
-				else{
-					merge_moves = ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, p, mrX, p.location()));
-				}
 
 			}
 			moves = ImmutableSet.copyOf(merge_moves);
@@ -387,7 +392,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// the move is a double move
 						// need to handle 2 destinations
 						// get only the final location, but subtract 2 tickets used.
-						mrX.use(Ticket.DOUBLE);
+						mrX.use(move.tickets());
 
 					}
 					else{
@@ -397,10 +402,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						mrX.use(t);
 					}
 					// reveal at certain round.
-					if (newLog.size() == 2){
+					if ((setup.rounds.size()-3 % 5 == 0) || setup.rounds.equals(ImmutableList.of(true))){
 						newLog.add(LogEntry.reveal(t, move.visit(findMoveLocation)));
 					}
-					newLog.add(LogEntry.hidden(t));
+					else{
+						newLog.add(LogEntry.hidden(t));
+					}
 
 				}
 				// update the current MrX position to the destination of the move.
