@@ -341,21 +341,37 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
-			Set<Move> merge_moves = new HashSet<>();
-			for (Player p : everyone) {
-				if (p.isMrX() && p.hasAtLeast(Ticket.DOUBLE, 1) && !setup.rounds.equals(ImmutableList.of(true))) {
-					merge_moves = ImmutableSet.<Move>builder()
-							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location())))
-							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, p, p.location())))
+			Set<Move> moves_mrx = new HashSet<>();
+			Set<Move> moves_detective = new HashSet<>();
+
+			for (Piece p : remaining) {
+				if (p.isMrX() && mrX.hasAtLeast(Ticket.DOUBLE, 1) && !setup.rounds.equals(ImmutableList.of(true))) {
+					moves_mrx = ImmutableSet.<Move>builder()
+							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
+							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, mrX, mrX.location())))
 							.build();
 				}
 				else if (p.isMrX()){
-					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
+					moves_mrx = ImmutableSet.<Move>builder()
+							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
+							.build();
 				}
-
-
+				else{
+					for(Player d : detectives){
+						if (d.piece() == p){
+							moves_detective = ImmutableSet.<Move>builder()
+									.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())))
+									.build();
+						}
+					}
+				}
 			}
-			moves = ImmutableSet.copyOf(merge_moves);
+			if (!remaining.contains(mrX.piece())){
+				moves = ImmutableSet.copyOf(moves_detective);
+			}
+			else{
+				moves = ImmutableSet.copyOf(moves_mrx);
+			}
 			return moves;
 		}
 		//--------------------------------------------------------------------------------------------------------------
@@ -366,6 +382,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 
 			@Override
+
 			public Object visit(Move.DoubleMove move) {
 				return move.destination2;
 			}
@@ -382,6 +399,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			ArrayList<Player> newDetectives = new ArrayList<>();
 			// left is the remaining player in the game
 			ArrayList<Piece> left = new ArrayList<>();
+			left.clear();
 			// Copy of log
 			ArrayList<LogEntry> newLog = new ArrayList<>(log);
 
@@ -407,6 +425,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 					else{
 						newLog.add(LogEntry.hidden(t));
+					}
+					for (Player d : detectives){
+						if (!d.tickets().isEmpty()){
+							left.add(d.piece());
+						}
 					}
 
 				}
@@ -437,14 +460,13 @@ public final class MyGameStateFactory implements Factory<GameState> {
 								d.at(move.visit(findMoveLocation));
 							}
 							if (!d.tickets().isEmpty()){
-								left.add(d.piece());
+								//left.add(d.piece());
+								left.add(newMrX.piece());
 								newDetectives.add(d);
 							}
 						}
 					}
-
 				}
-
 			}
 			// use the new updated version of either MrX or detectives
 			// change in remaining
