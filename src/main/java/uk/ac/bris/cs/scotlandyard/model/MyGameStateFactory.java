@@ -115,15 +115,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				Player mrX,
 				int source){
 			final var singleMoves = new ArrayList<Move.SingleMove>();
-
-			for (int destination : setup.graph.adjacentNodes(source)) {
+ 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
 
-				detectives.remove(player);
-
 				for (Player d : detectives) {
-					if (d.location() == destination && d.location() == mrX.location()){
+					if (d.location() == destination && d.location() == mrX.location() && d == player){
 						break;
 					}
 					for (Transport t : Objects.requireNonNull(
@@ -133,9 +130,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 									ImmutableSet.of()))) {
 						// TO DO find out if the player has the required tickets
 						// if it does, construct SingleMove and add it the list of moves to return
-						if (d.has(t.requiredTicket())) {
+						if (player.has(t.requiredTicket())) {
 							singleMoves.add(new Move.SingleMove(
-									d.piece(),
+									player.piece(),
 									source,
 									t.requiredTicket(),
 									destination));
@@ -328,6 +325,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Piece> getWinner() {
+			if (remaining.isEmpty()){
+				winner.isEmpty();
+			}
 			return winner;
 		}
 
@@ -344,9 +344,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				else if (p.isMrX()){
 					merge_moves = ImmutableSet.copyOf(makeSingleMoves(setup, detectives, p, p.location()));
 				}
-				//if (p.isDetective()){
-					//merge_moves = ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, p, mrX, p.location()));
-				//}
+
+				else{
+					merge_moves = ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, p, mrX, p.location()));
+				}
+
 			}
 			moves = ImmutableSet.copyOf(merge_moves);
 			return moves;
@@ -366,7 +368,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public GameState advance(Move move) {
-			if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
+			//if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
+
 			Move.Visitor<Integer> findMoveLocation = new findMove();
 			// make copy of MrX
 			Player newMrX = mrX;
@@ -375,7 +378,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// left is the remaining player in the game
 			ArrayList<Piece> left = new ArrayList<>();
 			// Copy of log
-			ImmutableList<LogEntry> newLog = ImmutableList.copyOf(log);
+			ArrayList<LogEntry> newLog = new ArrayList<>(log);
 
 			// condition for Mr X
 			if (move.commencedBy().isMrX()){
@@ -388,31 +391,22 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 					}
 					else{
-						// total used ticket is 1. Just update current position normally.
+						// total used ticket is 1.
 						// make new ticket list to insert into new MrX.
-						// find the final destination of the move, add to current move.visit()
 						// need to implement visitor
 						mrX.use(t);
 					}
-					for (LogEntry l : newLog){
-						switch (newLog.size()){
-							case 3:
-								l.hidden(t);
-							case 8:
-								l.hidden(t);
-							case 13:
-								l.hidden(t);
-							case 18:
-								l.hidden(t);
-							case 24:
-								l.hidden(t);
-						}
+					// reveal at certain round.
+					if (newLog.size() == 2){
+						newLog.add(LogEntry.reveal(t, move.visit(findMoveLocation)));
 					}
+					newLog.add(LogEntry.hidden(t));
 
 				}
-
+				// update the current MrX position to the destination of the move.
 				newMrX.at(move.visit(findMoveLocation));
 
+				// if MrX still has ticket, then still in game.
 				if (!newMrX.tickets().isEmpty()){
 					left.add(newMrX.piece());
 				}
@@ -450,8 +444,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// change in log, add the move that been made by MrX
 			ImmutableSet<Piece> newRemaining = ImmutableSet.copyOf(left);
 			ImmutableList<Player> remainingDetectives = ImmutableList.copyOf(newDetectives);
+			ImmutableList<LogEntry> updatedLog = ImmutableList.copyOf(newLog);
 
-			return new MyGameState(setup, newRemaining, newLog, newMrX, remainingDetectives);
+			return new MyGameState(setup, newRemaining, updatedLog, newMrX, remainingDetectives);
 		}
 	}
 }
