@@ -82,7 +82,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				for (int j = 0; j < detectives.size(); j++){
 					if(i != j){
 						if (detectives.get(i).location() == detectives.get(j).location()){
-							throw new IllegalArgumentException("Duplicate detectives");
+							throw new IllegalArgumentException("Duplicate detectives location");
 						}
 					}
 				}
@@ -358,7 +358,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				}
 				else{
 					for(Player d : detectives){
-						if (d.piece() == p){
+						if (remaining.contains(d.piece())){
 							moves_detective = ImmutableSet.<Move>builder()
 									.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())))
 									.build();
@@ -366,6 +366,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 				}
 			}
+
 			if (!remaining.contains(mrX.piece())){
 				moves = ImmutableSet.copyOf(moves_detective);
 			}
@@ -399,26 +400,25 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			ArrayList<Player> newDetectives = new ArrayList<>();
 			// left is the remaining player in the game
 			ArrayList<Piece> left = new ArrayList<>();
-			left.clear();
 			// Copy of log
 			ArrayList<LogEntry> newLog = new ArrayList<>(log);
 
 			// condition for Mr X
 			if (move.commencedBy().isMrX()){
-				for (Ticket t : move.tickets()){
-					if (t.equals(Ticket.DOUBLE)){
+				for (Ticket t : move.tickets()) {
+					if (t.equals(Ticket.DOUBLE)) {
 						// the move is a double move
 						// need to handle 2 destinations
 						// get only the final location, but subtract 2 tickets used.
-						mrX.use(move.tickets());
+						mrX.use(Ticket.DOUBLE);
 
-					}
-					else{
+					} else {
 						// total used ticket is 1.
 						// make new ticket list to insert into new MrX.
 						// need to implement visitor
 						mrX.use(t);
 					}
+
 					// reveal at certain round.
 					if ((setup.rounds.size()-3 % 5 == 0) || setup.rounds.equals(ImmutableList.of(true))){
 						newLog.add(LogEntry.reveal(t, move.visit(findMoveLocation)));
@@ -426,20 +426,18 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					else{
 						newLog.add(LogEntry.hidden(t));
 					}
-					for (Player d : detectives){
-						if (!d.tickets().isEmpty()){
-							left.add(d.piece());
-						}
+
+					// update the current MrX position to the destination of the move.
+					newMrX.at(move.visit(findMoveLocation));
+
+				}
+
+				for (Player d : detectives){
+					if (!d.tickets().isEmpty()){
+						left.add(d.piece());
 					}
-
 				}
-				// update the current MrX position to the destination of the move.
-				newMrX.at(move.visit(findMoveLocation));
 
-				// if MrX still has ticket, then still in game.
-				if (!newMrX.tickets().isEmpty()){
-					left.add(newMrX.piece());
-				}
 
 
 			}
@@ -460,9 +458,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 								d.at(move.visit(findMoveLocation));
 							}
 							if (!d.tickets().isEmpty()){
-								//left.add(d.piece());
-								left.add(newMrX.piece());
 								newDetectives.add(d);
+							}
+
+							// if MrX still has ticket, then still in game.
+							if (!newMrX.tickets().isEmpty()){
+								left.add(newMrX.piece());
 							}
 						}
 					}
