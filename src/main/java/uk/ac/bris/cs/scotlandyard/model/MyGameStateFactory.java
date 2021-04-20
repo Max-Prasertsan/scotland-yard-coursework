@@ -345,7 +345,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
 			Set<Move> moves_mrx = new HashSet<>();
-			Set<Move> moves_detective = new HashSet<>();
+			Set<Move> moves_detective = ImmutableSet.<Move>builder().build();
 
 			for (Piece p : remaining) {
 
@@ -361,48 +361,34 @@ public final class MyGameStateFactory implements Factory<GameState> {
 							.build();
 				}
 				else {
-					//This part of your code seems incorrect.(by TA)
+					// This part of your code seems incorrect.(by TA)
 					// You want getAvailableMoves() to return the moves for everyone in the remaining set.
 					// (When it is not MrX's turn)
 
-					/* my stupid code
-					int DetectiveAt = 0;
-					ImmutableMap<Ticket,Integer> map = null;
-					for (Player d : detectives){
+					//Here we set moves_detective to a set of moves for the piece p. However, note that in the next iteration
+					// of the for loop, moves_detective is changed and now contains a set of moves for another piece. The set of
+					// moves we previously had, is lost.
+					// This is the issue. In each iteration of the for loop, we want to add the moves to an existing set of moves. In
+					// the end, we return this big set of moves for all the detectives in remaining.
+
+
+					for (Player d : detectives) {
 						if (d.piece() == p) {
-							DetectiveAt = d.location();
-							 map = ImmutableMap.<Ticket,Integer>builder()
-									.putAll(d.tickets())
-									.build();
+							moves_detective
+									.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())));
 						}
 					}
-					Player a = new Player(p, map, DetectiveAt);
-					*/
-
-					for(Piece a : remaining){
-						//int DetectiveAt = 0;
-						for (Player d : detectives) {
-							if (d.piece() == p) {
-								moves_detective = ImmutableSet.<Move>builder()
-										.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())))
-										.build();
-							}
-						}
-
-
-					}
-
-
-
-
-
 				}
+
 			}
 			if (!remaining.contains(mrX.piece())){
 				moves = ImmutableSet.copyOf(moves_detective);
 			}
 			else{
-				moves = ImmutableSet.copyOf(moves_mrx);
+				moves = ImmutableSet.<Move>builder()
+						.addAll(ImmutableSet.copyOf(moves_mrx))
+						.addAll(ImmutableSet.copyOf(moves_detective))
+						.build();
 			}
 
 			return moves;
