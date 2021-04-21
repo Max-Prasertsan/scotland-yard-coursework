@@ -295,12 +295,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Nonnull
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
 			Optional<Integer> DetectiveAt = Optional.empty();
-			for (Player d : detectives){
+			for (Player d : detectives) {
 				if (d.piece() == detective) DetectiveAt = Optional.of(d.location());
 			}
 			return DetectiveAt;
 		}
-
 
 		@Nonnull
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
@@ -345,7 +344,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
 			Set<Move> moves_mrx = new HashSet<>();
-			Set<Move> moves_detective = ImmutableSet.<Move>builder().build();
+			Set<Move> moves_detective = new HashSet<>();
 
 			for (Piece p : remaining) {
 
@@ -361,21 +360,17 @@ public final class MyGameStateFactory implements Factory<GameState> {
 							.build();
 				}
 				else {
-					// This part of your code seems incorrect.(by TA)
-					// You want getAvailableMoves() to return the moves for everyone in the remaining set.
-					// (When it is not MrX's turn)
 
-					//Here we set moves_detective to a set of moves for the piece p. However, note that in the next iteration
-					// of the for loop, moves_detective is changed and now contains a set of moves for another piece. The set of
-					// moves we previously had, is lost.
 					// This is the issue. In each iteration of the for loop, we want to add the moves to an existing set of moves. In
 					// the end, we return this big set of moves for all the detectives in remaining.
 
 
 					for (Player d : detectives) {
-						if (d.piece() == p) {
-							moves_detective
-									.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())));
+						if (d.piece().equals(p)) {
+							moves_detective = ImmutableSet.<Move>builder()
+									.addAll(moves_detective)
+									.addAll(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location()))
+									.build();
 						}
 					}
 				}
@@ -386,8 +381,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			else{
 				moves = ImmutableSet.<Move>builder()
-						.addAll(ImmutableSet.copyOf(moves_mrx))
-						.addAll(ImmutableSet.copyOf(moves_detective))
+						.addAll(moves_mrx)
+						.addAll(moves_detective)
 						.build();
 			}
 
@@ -411,7 +406,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Override public GameState advance(Move move) {
 			//if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
 
-			Move.Visitor<Integer> findMoveLocation = new findMove();
+			Move.Visitor<Integer> findMoveLocation = new uk.ac.bris.cs.scotlandyard.model.MyGameStateFactory.MyGameState.findMove();
 			// make copy of MrX
 			Player newMrX = mrX;
 			// copy of detective
@@ -452,6 +447,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					for (Player d : detectives){
 						if (!d.tickets().isEmpty()){
 							left.add(d.piece());
+							newDetectives.add(d);
 						}
 					}
 
@@ -498,7 +494,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			ImmutableList<Player> remainingDetectives = ImmutableList.copyOf(newDetectives);
 			ImmutableList<LogEntry> updatedLog = ImmutableList.copyOf(newLog);
 
-			return new MyGameState(setup, newRemaining, updatedLog, newMrX, remainingDetectives);
+			return new uk.ac.bris.cs.scotlandyard.model.MyGameStateFactory.MyGameState(setup, newRemaining, updatedLog, newMrX, remainingDetectives);
 		}
 	}
 }
+
+
