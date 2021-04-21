@@ -1,10 +1,7 @@
 package uk.ac.bris.cs.scotlandyard.model;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import impl.org.controlsfx.collections.MappingChange;
-import org.checkerframework.checker.units.qual.A;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
@@ -69,22 +66,63 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			if (mrX.isDetective()) throw new IllegalArgumentException("Mr X is invalid");
 
 			// Check for Duplicate detectives
+			/** Since I got the error about this part
+			 * when testing GameStateDetectivesAvailableMoveTest,
+			 * I think we have a problem here. and, I wrote other 2 functions below.
+			 * All functions could pass testDuplicateDetectivesShouldThrow()
+			 * in GameStateCreationTest.java
+			 *
+			 * But, only the first method you wrote worked some of DetectiveMoveTest
+			 * and Others cannot pass even 1 test.
+			 *
+			 * What do you think? Sorry, if I'm wrong
+			 */
+
+			// 1. Your ordinal ver.
+
 			for (int i = 0; i < detectives.size(); i++){
 				for (int j = 0; j < detectives.size(); j++){
 					if(i != j){
-						if (detectives.get(i).equals(detectives.get(j))){
-							throw new IllegalArgumentException("Duplicate detectives");
-						}
+						if (detectives.get(i).equals(detectives.get(j))) throw new IllegalArgumentException("Duplicate detectives");
 					}
 				}
 			}
+
+
+			/* 2. Your oridinal code Editing ver.
+
+			for (int i = 0; i < detectives.size(); i++){
+				for (int j = 1; j < detectives.size(); j++){
+						if (detectives.get(i).equals(detectives.get(j))) throw new IllegalArgumentException("Duplicate detectives");
+
+				}
+			}
+
+			 */
+
+
+			/* 3. I rewrite in terms of runtime.
+			Set<Player> forCheckDuplicate = new LinkedHashSet<Player>();
+			for(int i=0; i>=detectives.size(); i++){
+				forCheckDuplicate.add(detectives.get(i));
+			}
+			if(detectives.size() != forCheckDuplicate.size()){
+				throw new IllegalArgumentException("Duplicate detectives");
+			}
+			*/
+
+
+
+
+
+
 
 			// Check for overlapping location.
 			for (int i = 0; i < detectives.size(); i++){
 				for (int j = 0; j < detectives.size(); j++){
 					if(i != j){
 						if (detectives.get(i).location() == detectives.get(j).location()){
-							throw new IllegalArgumentException("Duplicate detectives");
+							throw new IllegalArgumentException("Duplicate detectives location");
 						}
 					}
 				}
