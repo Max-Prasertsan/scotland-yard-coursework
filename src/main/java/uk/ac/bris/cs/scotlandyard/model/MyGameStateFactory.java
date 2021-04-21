@@ -226,8 +226,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 														t2.requiredTicket(),
 														destination2));
 											}
-										}
-										else{
+										} else{
 											doubleMoves.add(new Move.DoubleMove(
 													player.piece(),
 													source,
@@ -329,8 +328,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			if (!remaining.isEmpty()){
 				if(!remaining.contains(mrX.piece())){
 					prizeMan.addAll(remaining);
-				}
-				else{
+				} else{
 					prizeMan.clear();
 				}
 			}
@@ -350,13 +348,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
 							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, mrX, mrX.location())))
 							.build();
-				}
-				else if (p.isMrX()){
+				} else if (p.isMrX()){
 					moves_mrx = ImmutableSet.<Move>builder()
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
 							.build();
-				}
-				else{
+				} else{
 					moves_detective = ImmutableSet.<Move>builder().build();
 					for(Player d : detectives){
 						if (remaining.contains(d.piece())){
@@ -371,14 +367,13 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 			if (!remaining.contains(mrX.piece())){
 				moves = ImmutableSet.copyOf(moves_detective);
-			}
-			else{
+			} else{
 				moves = ImmutableSet.copyOf(moves_mrx);
 			}
 			return moves;
 		}
 		//--------------------------------------------------------------------------------------------------------------
-		public static class findMove implements Move.Visitor {
+		public static class findMove implements Move.Visitor<Object> {
 			@Override
 			public Object visit(Move.SingleMove move) {
 				return move.destination;
@@ -393,9 +388,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public GameState advance(Move move) {
-			//if (!moves.contains(move)) throw new IllegalArgumentException("Illegal move: " + move);
+			//if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
 
-			Move.Visitor<Integer> findMoveLocation = new findMove();
+			findMove findMoveLocation = new findMove();
 			// make copy of MrX
 			Player newMrX = mrX;
 			// copy of detective
@@ -423,15 +418,13 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 					// reveal at certain round.
 					if ((setup.rounds.size()-3 % 5 == 0) || setup.rounds.equals(ImmutableList.of(true))){
-						newLog.add(LogEntry.reveal(t, move.visit(findMoveLocation)));
-					}
-					else{
+						newLog.add(LogEntry.reveal(t, (int)move.visit(findMoveLocation)));
+					} else{
 						newLog.add(LogEntry.hidden(t));
 					}
 
 					// update the current MrX position to the destination of the move.
-					newMrX.at(move.visit(findMoveLocation));
-
+					newMrX.at((int)move.visit(findMoveLocation));
 				}
 
 				for (Player d : detectives){
@@ -441,11 +434,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 				}
 
-
-
 			}
 			// condition for Detectives
-			else{
+			else if (move.commencedBy().isDetective()){
+				System.out.println("in detective");
 				for (Ticket t : move.tickets()){
 					if (t.equals(Ticket.DOUBLE)) throw new IllegalArgumentException("Detective has double move");
 					else{
@@ -455,15 +447,25 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// create new instant of that detective
 						// add to the 'remaining' list.
 						for (Player d : detectives){
+							System.out.println(d.piece());
 							if (d.piece().equals(move.commencedBy())){
+								System.out.println(d);
+								System.out.println("Use ticket");
 								d.use(t);
+								System.out.println(t);
 								newMrX.give(t);
-								d.at(move.visit(findMoveLocation));
-							}
-							if (!d.tickets().isEmpty()){
-								newDetectives.add(d);
-							}
+								System.out.println("assign location");
 
+								d.at((int)move.visit(findMoveLocation));
+
+								System.out.println((int)move.visit(findMoveLocation));
+								System.out.println(d.at((int)move.visit(findMoveLocation)));
+
+								if (!d.tickets().isEmpty()){
+									newDetectives.add(d);
+									System.out.println(d);
+								}
+							}
 							// if MrX still has ticket, then still in game.
 							if (!newMrX.tickets().isEmpty()){
 								left.add(newMrX.piece());
