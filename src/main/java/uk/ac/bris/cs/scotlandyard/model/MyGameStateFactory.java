@@ -447,23 +447,13 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// create new instant of that detective
 						// add to the 'remaining' list.
 						for (Player d : detectives){
-							System.out.println(d.piece());
 							if (d.piece().equals(move.commencedBy())){
-								System.out.println(d);
-								System.out.println("Use ticket");
-								d.use(t);
-								System.out.println(t);
+								d = d.use(t);
 								newMrX.give(t);
-								System.out.println("assign location");
-
-								d.at((int)move.visit(findMoveLocation));
-
-								System.out.println((int)move.visit(findMoveLocation));
-								System.out.println(d.at((int)move.visit(findMoveLocation)));
+								d = d.at((int)move.visit(findMoveLocation));
 
 								if (!d.tickets().isEmpty()){
 									newDetectives.add(d);
-									System.out.println(d);
 								}
 							}
 							// if MrX still has ticket, then still in game.

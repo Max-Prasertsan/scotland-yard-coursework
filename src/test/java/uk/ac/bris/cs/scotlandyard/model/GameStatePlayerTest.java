@@ -164,7 +164,6 @@ public class GameStatePlayerTest extends ParameterisedModelTestBase {
 		assertThat(state.getDetectiveLocation(BLUE)).contains(94);
 		state = state.advance(taxi(MRX, 45, 46));
 		state = state.advance(taxi(BLUE, 94, 93));
-		System.out.println(state.getDetectiveLocation(BLUE));
 		assertThat(state.getDetectiveLocation(BLUE)).contains(93);
 		state = state.advance(taxi(MRX, 46, 47));
 		state = state.advance(taxi(BLUE, 93, 92));
