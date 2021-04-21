@@ -437,7 +437,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			// condition for Detectives
 			else if (move.commencedBy().isDetective()){
-				System.out.println("in detective");
 				for (Ticket t : move.tickets()){
 					if (t.equals(Ticket.DOUBLE)) throw new IllegalArgumentException("Detective has double move");
 					else{
@@ -447,19 +446,16 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// create new instant of that detective
 						// add to the 'remaining' list.
 						for (Player d : detectives){
-							if (d.piece().equals(move.commencedBy())){
+							if (d.piece().equals(move.commencedBy()) && d.has(t)){
 								d = d.use(t);
 								newMrX.give(t);
 								d = d.at((int)move.visit(findMoveLocation));
-
-								if (!d.tickets().isEmpty()){
-									newDetectives.add(d);
-								}
 							}
 							// if MrX still has ticket, then still in game.
 							if (!newMrX.tickets().isEmpty()){
 								left.add(newMrX.piece());
 							}
+							newDetectives.add(d);
 						}
 					}
 				}
