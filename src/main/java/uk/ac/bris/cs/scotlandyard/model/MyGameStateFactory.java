@@ -357,9 +357,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 							.build();
 				}
 				else{
+					moves_detective = ImmutableSet.<Move>builder().build();
 					for(Player d : detectives){
 						if (remaining.contains(d.piece())){
 							moves_detective = ImmutableSet.<Move>builder()
+									.addAll(moves_detective)
 									.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())))
 									.build();
 						}
@@ -435,6 +437,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				for (Player d : detectives){
 					if (!d.tickets().isEmpty()){
 						left.add(d.piece());
+						newDetectives.add(d);
 					}
 				}
 
