@@ -51,7 +51,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			Set<Move> moves_detective = new HashSet<>();
 
 			for (Piece p : remaining) {
-				if (p.isMrX() && mrX.hasAtLeast(Ticket.DOUBLE, 1) && !setup.rounds.equals(ImmutableList.of(true))) {
+				if (p.isMrX() && mrX.has(Ticket.DOUBLE) && !(setup.rounds.size() == log.size() - 1) && !setup.rounds.equals(ImmutableList.of(true))) {
 					moves_mrx = ImmutableSet.<Move>builder()
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
 							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, mrX, mrX.location())))
@@ -389,7 +389,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public GameState advance(Move move) {
-			//if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
+			if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
 
 			findMove findMoveLocation = new findMove();
 			// make copy of MrX
