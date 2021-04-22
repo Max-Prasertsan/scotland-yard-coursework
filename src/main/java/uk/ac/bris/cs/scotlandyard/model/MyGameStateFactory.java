@@ -389,7 +389,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public GameState advance(Move move) {
-			if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
+			//if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
 
 			findMove findMoveLocation = new findMove();
 			// make copy of MrX
@@ -416,13 +416,25 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						// make new ticket list to insert into new MrX.
 						// need to implement visitor
 						newMrX = newMrX.use(t);
+
+						// reveal at certain round.
+						if (setup.rounds.get(log.size())){
+							System.out.println(newLog);
+							System.out.println(setup.rounds);
+							System.out.println("reveal");
+							newLog.add(LogEntry.reveal(t, (int)move.visit(findMoveLocation)));
+							System.out.println(t);
+							System.out.println(newLog);
+						} else{
+							System.out.println(newLog);
+							System.out.println(setup.rounds);
+							System.out.println("Hidden");
+							newLog.add(LogEntry.hidden(t));
+							System.out.println(t);
+							System.out.println(newLog);
+						}
 					}
-					// reveal at certain round.
-					if ((setup.rounds.size()-3 % 5 == 0) || setup.rounds.equals(ImmutableList.of(true))){
-						newLog.add(LogEntry.reveal(t, (int)move.visit(findMoveLocation)));
-					} else{
-						newLog.add(LogEntry.hidden(t));
-					}
+
 					// update the current MrX position to the destination of the move.
 					newMrX = newMrX.at((int)move.visit(findMoveLocation));
 				}
