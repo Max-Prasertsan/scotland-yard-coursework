@@ -42,20 +42,26 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.mrX = mrX;
 			this.detectives = detectives;
 
+			//----------------------------------------------------------------------------------------------------------
+			// Setting up all player.
 			List<Player> e = new ArrayList<>();
 			e.add(mrX);
 			e.addAll(detectives);
-			everyone = ImmutableList.copyOf(e);
-
+			this.everyone = ImmutableList.copyOf(e);
+			//----------------------------------------------------------------------------------------------------------
+			// Setting up valid move set.
 			Set<Move> moves_mrx = new HashSet<>();
 			Set<Move> moves_detective = new HashSet<>();
 
 			for (Piece p : remaining) {
-				if (p.isMrX() && mrX.has(Ticket.DOUBLE) && !(setup.rounds.size() == log.size() - 1) && !setup.rounds.equals(ImmutableList.of(true))) {
+				if (p.isMrX() && mrX.has(Ticket.DOUBLE)
+						&& !(setup.rounds.size() == log.size() - 1)
+						&& !setup.rounds.equals(ImmutableList.of(true))) {
 					moves_mrx = ImmutableSet.<Move>builder()
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
 							.addAll(ImmutableSet.copyOf(makeDoubleMoves(setup, detectives, mrX, mrX.location())))
 							.build();
+
 				} else if (p.isMrX()){
 					moves_mrx = ImmutableSet.<Move>builder()
 							.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, mrX, mrX.location())))
@@ -74,10 +80,23 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 
 			if (!remaining.contains(mrX.piece())){
-				moves = ImmutableSet.copyOf(moves_detective);
+				this.moves = ImmutableSet.copyOf(moves_detective);
 			} else{
-				moves = ImmutableSet.copyOf(moves_mrx);
+				this.moves = ImmutableSet.copyOf(moves_mrx);
 			}
+			//----------------------------------------------------------------------------------------------------------
+			// Setting up winner
+			Set<Piece> prizeMan = new LinkedHashSet<>();
+			if (!remaining.isEmpty()){
+				if(!remaining.contains(mrX.piece()) || moves.isEmpty()){
+					prizeMan.addAll(remaining);
+				}
+				else if (setup.rounds.size() == log.size()){
+					prizeMan.addAll(remaining);
+				}
+			}
+
+			winner = ImmutableSet.copyOf(prizeMan);
 
 			//----------------------------------------------------------------------------------------------------------
 			// CHECKING PART
@@ -135,9 +154,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			if (setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("The graph is empty");
 
 			// Check if the winner is empty
-			//if (winner.isEmpty()) throw new IllegalArgumentException("The winner is empty");
+			//if (!winner.isEmpty()) throw new NullPointerException("Winner already decided");
 		}
-		//------------------------------------------------------------------------------------------------------------------------------------
+		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
 		// DETECTIVES SINGLE MOVE
 		private static ImmutableSet<Move.SingleMove> makeSingleDetectiveMoves(
@@ -175,9 +194,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 			return ImmutableSet.copyOf(singleMoves);
 		}
-		//------------------------------------------------------------------------------------------------------------------------------
+		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
-		// SINGLE MOVE
+		// MRX SINGLE MOVE
 		private static ImmutableSet<Move.SingleMove> makeSingleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -218,7 +237,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 			return ImmutableSet.copyOf(singleMoves);
 		}
-		//-----------------------------------------------------------------------------------------------------------------------------------------
+		//--------------------------------------------------------------------------------------------------------------
+		// MRX DOUBLE MOVE
 		private static ImmutableSet<Move.DoubleMove> makeDoubleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -303,7 +323,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			return ImmutableSet.copyOf(doubleMoves);
 		}
-//-------------------------------------------------------------------------------------------------------------------------------------------------
+		//--------------------------------------------------------------------------------------------------------------
 		@Nonnull
 		@Override public GameSetup getSetup() {
 			return setup;
@@ -324,6 +344,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Override public Optional<Integer> getDetectiveLocation(Detective detective) {
 			Optional<Integer> DetectiveAt = Optional.empty();
 			for (Player d : detectives){
+				// use method .location() to return detective location.
 				if (d.piece() == detective) DetectiveAt = Optional.of(d.location());
 			}
 			return DetectiveAt;
@@ -336,6 +357,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				if (p.piece() == piece){
 					//return Optional.of(ticket -> p.tickets().get(ticket));
 					// alternative option using lambda.
+					// but use normal implement instead for easier understanding.
 
 					return Optional.of(new TicketBoard() {
 						@Override
@@ -356,16 +378,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Piece> getWinner() {
-			Set<Piece> prizeMan = new LinkedHashSet<>();
-			if (!remaining.isEmpty()){
-				if(!remaining.contains(mrX.piece())){
-					prizeMan.addAll(remaining);
-				} else{
-					prizeMan.clear();
-				}
-			}
-
-			winner = ImmutableSet.copyOf(prizeMan);
 			return winner;
 		}
 

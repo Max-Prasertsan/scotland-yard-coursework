@@ -16,6 +16,7 @@ public final class MyModelFactory implements Factory<Model> {
 	                                      Player mrX,
 	                                      ImmutableList<Player> detectives) {
 		// TODO
+
 		throw new RuntimeException("Implement me!");
 	}
 }
