@@ -27,7 +27,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private final Player mrX;
 		private final List<Player> detectives;
 		private final ImmutableList<Player> everyone;
-		private ImmutableSet<Move> moves;
+		private final ImmutableSet<Move> moves;
 		private ImmutableSet<Piece> winner;
 
 		private MyGameState(
@@ -418,20 +418,10 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						newMrX = newMrX.use(t);
 
 						// reveal at certain round.
-						if (setup.rounds.get(log.size())){
-							System.out.println(newLog);
-							System.out.println(setup.rounds);
-							System.out.println("reveal");
+						if (setup.rounds.get(newLog.size())){
 							newLog.add(LogEntry.reveal(t, (int)move.visit(findMoveLocation)));
-							System.out.println(t);
-							System.out.println(newLog);
 						} else{
-							System.out.println(newLog);
-							System.out.println(setup.rounds);
-							System.out.println("Hidden");
 							newLog.add(LogEntry.hidden(t));
-							System.out.println(t);
-							System.out.println(newLog);
 						}
 					}
 
@@ -463,12 +453,15 @@ public final class MyGameStateFactory implements Factory<GameState> {
 								newMrX = newMrX.give(t);
 								d = d.at((int)move.visit(findMoveLocation));
 							}
-							// if MrX still has ticket, then still in game.
-							if (!newMrX.tickets().isEmpty()){
-								left.add(newMrX.piece());
+							else if (remaining.contains(d.piece())){
+								left.add(d.piece());
 							}
 							newDetectives.add(d);
 						}
+					}
+					// if MrX still has ticket, then still in game.
+					if (!newMrX.tickets().isEmpty() && remaining.size() == 1){
+						left.add(newMrX.piece());
 					}
 				}
 			}
@@ -478,7 +471,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			ImmutableSet<Piece> newRemaining = ImmutableSet.copyOf(left);
 			ImmutableList<Player> remainingDetectives = ImmutableList.copyOf(newDetectives);
 			ImmutableList<LogEntry> updatedLog = ImmutableList.copyOf(newLog);
-
 			return new MyGameState(setup, newRemaining, updatedLog, newMrX, remainingDetectives);
 		}
 	}
