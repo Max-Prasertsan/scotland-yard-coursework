@@ -24,7 +24,7 @@ public final class GameSetup implements Serializable {
 	/**
 	 * MrX reveal rounds; false is hidden, true is reveal
 	 */
-	public final ImmutableList<Boolean> rounds;
+	public ImmutableList<Boolean> rounds;
 	public GameSetup(@Nonnull ImmutableValueGraph<Integer, ImmutableSet<Transport>> graph,
 	                 @Nonnull ImmutableList<Boolean> rounds) {
 		this.graph = Objects.requireNonNull(graph);

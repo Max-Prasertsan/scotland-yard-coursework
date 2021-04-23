@@ -27,8 +27,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		private final Player mrX;
 		private final List<Player> detectives;
 		private final ImmutableList<Player> everyone;
-		private final ImmutableSet<Move> moves;
-		private ImmutableSet<Piece> winner;
+		private ImmutableSet<Move> moves;
+		private final ImmutableSet<Piece> winner;
 
 		private MyGameState(
 				final GameSetup setup,
@@ -80,20 +80,35 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 
 			if (!remaining.contains(mrX.piece())){
-				this.moves = ImmutableSet.copyOf(moves_detective);
+				moves = ImmutableSet.copyOf(moves_detective);
 			} else{
-				this.moves = ImmutableSet.copyOf(moves_mrx);
+				moves = ImmutableSet.copyOf(moves_mrx);
 			}
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up winner
 			Set<Piece> prizeMan = new LinkedHashSet<>();
 			if (!remaining.isEmpty()){
-				if(!remaining.contains(mrX.piece()) || moves.isEmpty()){
-					prizeMan.addAll(remaining);
+				if(!remaining.contains(mrX.piece()) && moves.isEmpty()){
+					for (Player d : detectives){
+						prizeMan.add(d.piece());
+					}
 				}
+
 				else if (setup.rounds.size() == log.size()){
-					prizeMan.addAll(remaining);
+					for (Player d : detectives){
+						prizeMan.add(d.piece());
+					}
 				}
+				 /**
+				else if (moves_mrx.isEmpty()){
+					for (Player d : detectives){
+						prizeMan.add(d.piece());
+					}
+				}
+				else if (setup.rounds.get(setup.rounds.size()-1) && remaining.contains(mrX.piece())){
+					prizeMan.add(mrX.piece());
+				}
+				  **/
 			}
 
 			winner = ImmutableSet.copyOf(prizeMan);
@@ -154,7 +169,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			if (setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("The graph is empty");
 
 			// Check if the winner is empty
-			//if (!winner.isEmpty()) throw new NullPointerException("Winner already decided");
+			//if (!(winner.isEmpty())) throw new IllegalArgumentException("Winner already decided");
 		}
 		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
@@ -383,7 +398,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public ImmutableSet<Move> getAvailableMoves() {
+			if(!winner.isEmpty()){
+				Set<Move> empty = new HashSet<>();
+				moves = ImmutableSet.copyOf(empty);
+			}
 			return moves;
+
 		}
 		//--------------------------------------------------------------------------------------------------------------
 		public static class findMove implements Move.Visitor<Object> {
