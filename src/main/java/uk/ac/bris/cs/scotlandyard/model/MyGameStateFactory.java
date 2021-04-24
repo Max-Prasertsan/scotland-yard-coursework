@@ -42,6 +42,14 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.mrX = mrX;
 			this.detectives = detectives;
 
+			int current_round = log.size();
+
+			//----------------------------------------------------------------------------------------------------------
+			// checking value at the start
+			System.out.println(remaining);
+			System.out.println(detectives);
+			System.out.println(current_round);
+
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up all player.
 			List<Player> e = new ArrayList<>();
@@ -84,31 +92,35 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			} else{
 				moves = ImmutableSet.copyOf(moves_mrx);
 			}
+			System.out.println(moves);
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up winner
 			Set<Piece> prizeMan = new LinkedHashSet<>();
 			if (!remaining.isEmpty()){
-				if(!remaining.contains(mrX.piece()) && moves.isEmpty()){
+				if(remaining.contains(mrX.piece()) && moves_mrx.isEmpty()){
 					for (Player d : detectives){
 						prizeMan.add(d.piece());
 					}
 				}
-
-				else if (setup.rounds.size() == log.size()){
+				else if(moves_detective.isEmpty()){
+					ArrayList<Piece> left = new ArrayList<>();
+					for (Player d : detectives){
+						if(remaining.contains(d.piece())){
+							left.add(d.piece());
+						}
+					}
+					if (left.size() == remaining.size()){
+						prizeMan.add(mrX.piece());
+					}
+				}
+				else if(setup.rounds.size() == current_round && moves_mrx.isEmpty()){
 					for (Player d : detectives){
 						prizeMan.add(d.piece());
 					}
 				}
-				 /**
-				else if (moves_mrx.isEmpty()){
-					for (Player d : detectives){
-						prizeMan.add(d.piece());
-					}
-				}
-				else if (setup.rounds.get(setup.rounds.size()-1) && remaining.contains(mrX.piece())){
+				else if (setup.rounds.size() == current_round && !(moves.isEmpty())){
 					prizeMan.add(mrX.piece());
 				}
-				  **/
 			}
 
 			winner = ImmutableSet.copyOf(prizeMan);
@@ -187,7 +199,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 				for (Player d : detectives) {
 					if (d.location() == destination && d.location() == mrX.location() && d == player){
-						break;
+						continue;
 					}
 					for (Transport t : Objects.requireNonNull(
 							setup.graph.edgeValueOrDefault(
@@ -222,10 +234,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-
 				for (Player d : detectives) {
 					if (d.location() == destination){
-						break;
+						continue;
 					}
 					for (Transport t : Objects.requireNonNull(
 							setup.graph.edgeValueOrDefault(
@@ -265,12 +276,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				// if the location is occupied, don't add to the list of moves to return
 				for (Player d : detectives) {
 					if (d.location() == destination1) {
-						break;
+						continue;
 					}
 					for (int destination2 : setup.graph.adjacentNodes(destination1)){
 						for (Player d2 : detectives){
 							if (d2.location() == destination2){
-								break;
+								continue;
 							}
 							for (Transport t1 : Objects.requireNonNull(
 									setup.graph.edgeValueOrDefault(
@@ -464,8 +475,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				for (Player d : detectives){
 					if (!d.tickets().isEmpty()){
 						left.add(d.piece());
-						newDetectives.add(d);
+						//newDetectives.add(d);
 					}
+					newDetectives.add(d);
 				}
 
 			}
@@ -485,7 +497,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 								newMrX = newMrX.give(t);
 								d = d.at((int)move.visit(findMoveLocation));
 							}
-							else if (remaining.contains(d.piece())){
+							else if (remaining.contains(d.piece()) && !(d.piece() == move.commencedBy())){
 								left.add(d.piece());
 							}
 							newDetectives.add(d);
