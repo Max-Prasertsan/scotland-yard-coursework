@@ -42,14 +42,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			this.mrX = mrX;
 			this.detectives = detectives;
 
+			// Number of rounds
 			int current_round = log.size();
 
-			//----------------------------------------------------------------------------------------------------------
-			// checking value at the start
+			System.out.println("Remaining >> ");
 			System.out.println(remaining);
-			System.out.println(detectives);
-			System.out.println(current_round);
-
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up all player.
 			List<Player> e = new ArrayList<>();
@@ -92,38 +89,66 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			} else{
 				moves = ImmutableSet.copyOf(moves_mrx);
 			}
+			System.out.println("Move >> ");
 			System.out.println(moves);
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up winner
 			Set<Piece> prizeMan = new LinkedHashSet<>();
 			if (!remaining.isEmpty()){
-				if(remaining.contains(mrX.piece()) && moves_mrx.isEmpty()){
+				if(remaining.contains(mrX.piece()) && moves.isEmpty()){
+					System.out.println("1");
 					for (Player d : detectives){
 						prizeMan.add(d.piece());
 					}
 				}
-				else if(moves_detective.isEmpty()){
-					ArrayList<Piece> left = new ArrayList<>();
+				else if (remaining.contains(mrX.piece())){
+					System.out.println("2");
+					ArrayList<Piece> gone = new ArrayList<>();
 					for (Player d : detectives){
-						if(remaining.contains(d.piece())){
-							left.add(d.piece());
+						if(!d.has(Ticket.TAXI) && !d.has(Ticket.BUS) && !d.has(Ticket.UNDERGROUND)){
+							gone.add(d.piece());
 						}
+
 					}
-					if (left.size() == remaining.size()){
+					if (gone.size() == detectives.size()){
 						prizeMan.add(mrX.piece());
 					}
 				}
-				else if(setup.rounds.size() == current_round && moves_mrx.isEmpty()){
+				else if (moves.isEmpty() && !remaining.contains(mrX.piece())){
+					System.out.println("3");
+					ArrayList<Piece> left = new ArrayList<>();
+					for (Player d : detectives){
+						if (remaining.contains(d.piece())){
+							left.add(d.piece());
+						}
+					}
+					if (left.size() == 0){
+						prizeMan.add(mrX.piece());
+					}
+
+				}
+
+				else if (setup.rounds.size() == current_round){
+					System.out.println("4");
+					prizeMan.add(mrX.piece());
+				}
+				boolean capture = false;
+				for (Player d : detectives){
+					if (d.location() == mrX.location()) {
+						capture = true;
+						break;
+					}
+				}
+				if (capture){
+					System.out.println("5");
 					for (Player d : detectives){
 						prizeMan.add(d.piece());
 					}
 				}
-				else if (setup.rounds.size() == current_round && !(moves.isEmpty())){
-					prizeMan.add(mrX.piece());
-				}
 			}
-
 			winner = ImmutableSet.copyOf(prizeMan);
+			System.out.println("Winner");
+			System.out.println(winner);
 
 			//----------------------------------------------------------------------------------------------------------
 			// CHECKING PART
@@ -180,8 +205,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// Check for empty graph
 			if (setup.graph.nodes().isEmpty()) throw new IllegalArgumentException("The graph is empty");
 
-			// Check if the winner is empty
-			//if (!(winner.isEmpty())) throw new IllegalArgumentException("Winner already decided");
 		}
 		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
@@ -473,9 +496,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				}
 
 				for (Player d : detectives){
-					if (!d.tickets().isEmpty()){
+					if (d.has(Ticket.TAXI) || d.has(Ticket.BUS) || d.has(Ticket.UNDERGROUND)){
 						left.add(d.piece());
-						//newDetectives.add(d);
 					}
 					newDetectives.add(d);
 				}
@@ -497,14 +519,21 @@ public final class MyGameStateFactory implements Factory<GameState> {
 								newMrX = newMrX.give(t);
 								d = d.at((int)move.visit(findMoveLocation));
 							}
-							else if (remaining.contains(d.piece()) && !(d.piece() == move.commencedBy())){
+							else if (remaining.contains(d.piece())
+									&& !(d.piece() == move.commencedBy())
+									&& (d.has(Ticket.TAXI)
+									|| d.has(Ticket.BUS)
+									|| d.has(Ticket.UNDERGROUND))){
 								left.add(d.piece());
 							}
 							newDetectives.add(d);
 						}
 					}
 					// if MrX still has ticket, then still in game.
-					if (!newMrX.tickets().isEmpty() && remaining.size() == 1){
+					if ((newMrX.has(Ticket.TAXI)
+							|| newMrX.has(Ticket.BUS)
+							|| newMrX.has(Ticket.UNDERGROUND))
+							&& remaining.size() == 1){
 						left.add(newMrX.piece());
 					}
 				}
