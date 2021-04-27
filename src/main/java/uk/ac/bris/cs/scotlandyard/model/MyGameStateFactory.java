@@ -44,8 +44,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			// Number of rounds
 			int current_round = log.size();
 
-			System.out.println("Remaining >> ");
-			System.out.println(remaining);
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up all player.
 			List<Player> e = new ArrayList<>();
@@ -88,20 +86,16 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			} else{
 				moves = ImmutableSet.copyOf(moves_mrx);
 			}
-			System.out.println("Move >> ");
-			System.out.println(moves);
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up winner
 			Set<Piece> prizeMan = new LinkedHashSet<>();
 			if (!remaining.isEmpty()){
 				if(remaining.contains(mrX.piece()) && moves.isEmpty()){
-					System.out.println("1");
 					for (Player d : detectives){
 						prizeMan.add(d.piece());
 					}
 				}
 				else if (remaining.contains(mrX.piece())){
-					System.out.println("2");
 					ArrayList<Piece> gone = new ArrayList<>();
 					for (Player d : detectives){
 						if(!d.has(Ticket.TAXI) && !d.has(Ticket.BUS) && !d.has(Ticket.UNDERGROUND)){
@@ -112,9 +106,11 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					if (gone.size() == detectives.size()){
 						prizeMan.add(mrX.piece());
 					}
+					if (setup.rounds.size() == current_round){
+						prizeMan.add(mrX.piece());
+					}
 				}
 				else if (moves.isEmpty() && !remaining.contains(mrX.piece())){
-					System.out.println("3");
 					ArrayList<Piece> left = new ArrayList<>();
 					for (Player d : detectives){
 						if (remaining.contains(d.piece())){
@@ -126,10 +122,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 
 				}
-				else if (setup.rounds.size() == current_round){
-					System.out.println("4");
-					prizeMan.add(mrX.piece());
-				}
 				boolean capture = false;
 				for (Player d : detectives){
 					if (d.location() == mrX.location()) {
@@ -138,15 +130,12 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 				}
 				if (capture){
-					System.out.println("5");
 					for (Player d : detectives){
 						prizeMan.add(d.piece());
 					}
 				}
 			}
 			winner = ImmutableSet.copyOf(prizeMan);
-			System.out.println("Winner");
-			System.out.println(winner);
 
 			//----------------------------------------------------------------------------------------------------------
 			// CHECKING PART

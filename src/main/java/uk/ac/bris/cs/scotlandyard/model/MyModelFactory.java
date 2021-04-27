@@ -26,9 +26,6 @@ public final class MyModelFactory implements Factory<Model> {
 	private static class MyModelState implements Model{
 		private HashSet<Observer> observers;
 
-		private MyModelState(){
-
-		}
 		public static class findObserver implements Observer {
 			@Override
 			public void onModelChanged(@Nonnull Board board, @Nonnull Event event) {
