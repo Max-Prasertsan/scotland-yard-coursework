@@ -2,7 +2,6 @@ package uk.ac.bris.cs.scotlandyard.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.checkerframework.checker.units.qual.A;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
@@ -206,6 +205,16 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		}
 		//--------------------------------------------------------------------------------------------------------------
+		// helper for checking if location has detective on it.
+		private static boolean checkLocation(int location, List<Player> detectives){
+			for (Player d : detectives){
+				if (d.location() == location){
+					return false;
+				}
+			}
+			return true;
+		}
+		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
 		// DETECTIVES SINGLE MOVE
 		private static ImmutableSet<Move.SingleMove> makeSingleDetectiveMoves(
@@ -218,11 +227,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
  			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-
-				for (Player d : detectives) {
-					if (d.location() == destination && d.location() == mrX.location() && d == player){
-						continue;
-					}
+				if (checkLocation(destination, detectives)){
 					for (Transport t : Objects.requireNonNull(
 							setup.graph.edgeValueOrDefault(
 									source,
@@ -239,8 +244,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						}
 					}
 				}
-			}
-
+ 			}
 			return ImmutableSet.copyOf(singleMoves);
 		}
 		//--------------------------------------------------------------------------------------------------------------
@@ -256,10 +260,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				for (Player d : detectives) {
-					if (d.location() == destination){
-						continue;
-					}
+				if (checkLocation(destination, detectives)){
 					for (Transport t : Objects.requireNonNull(
 							setup.graph.edgeValueOrDefault(
 									source,
@@ -282,7 +283,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 				}
 			}
-
 			return ImmutableSet.copyOf(singleMoves);
 		}
 		//--------------------------------------------------------------------------------------------------------------
@@ -296,15 +296,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination1 : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				for (Player d : detectives) {
-					if (d.location() == destination1) {
-						continue;
-					}
+				if (checkLocation(destination1, detectives)){
 					for (int destination2 : setup.graph.adjacentNodes(destination1)){
-						for (Player d2 : detectives){
-							if (d2.location() == destination2){
-								continue;
-							}
+						if (checkLocation(destination2, detectives)){
 							for (Transport t1 : Objects.requireNonNull(
 									setup.graph.edgeValueOrDefault(
 											source,
