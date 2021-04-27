@@ -2,7 +2,6 @@ package uk.ac.bris.cs.scotlandyard.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.checkerframework.checker.units.qual.A;
 import uk.ac.bris.cs.scotlandyard.model.Board.GameState;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.*;
 import java.util.*;
@@ -94,6 +93,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up winner
 			Set<Piece> prizeMan = new LinkedHashSet<>();
+
 			if (!remaining.isEmpty()){
 				if(remaining.contains(mrX.piece()) && moves.isEmpty()){
 					System.out.println("1");
@@ -113,6 +113,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					if (gone.size() == detectives.size()){
 						prizeMan.add(mrX.piece());
 					}
+					if (setup.rounds.size() == current_round){
+						prizeMan.add(mrX.piece());
+					}
 				}
 				else if (moves.isEmpty() && !remaining.contains(mrX.piece())){
 					System.out.println("3");
@@ -128,10 +131,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 				}
 
-				else if (setup.rounds.size() == current_round){
-					System.out.println("4");
-					prizeMan.add(mrX.piece());
-				}
+
 				boolean capture = false;
 				for (Player d : detectives){
 					if (d.location() == mrX.location()) {
@@ -207,6 +207,16 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		}
 		//--------------------------------------------------------------------------------------------------------------
+		// helper for checking if location has detective on it.
+		private static boolean checkLocation(int location, List<Player> detectives){
+			for (Player d : detectives){
+				if (d.location() == location){
+					return false;
+				}
+			}
+			return true;
+		}
+		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
 		// DETECTIVES SINGLE MOVE
 		private static ImmutableSet<Move.SingleMove> makeSingleDetectiveMoves(
@@ -220,10 +230,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
 
-				for (Player d : detectives) {
-					if (d.location() == destination && d.location() == mrX.location() && d == player){
-						continue;
-					}
+				if (checkLocation(destination, detectives)){
 					for (Transport t : Objects.requireNonNull(
 							setup.graph.edgeValueOrDefault(
 									source,
@@ -257,10 +264,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				for (Player d : detectives) {
-					if (d.location() == destination){
-						continue;
-					}
+				if (checkLocation(destination, detectives)){
 					for (Transport t : Objects.requireNonNull(
 							setup.graph.edgeValueOrDefault(
 									source,
@@ -297,15 +301,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			for (int destination1 : setup.graph.adjacentNodes(source)) {
 				// TO DO find out if destination is occupied by a detective
 				// if the location is occupied, don't add to the list of moves to return
-				for (Player d : detectives) {
-					if (d.location() == destination1) {
-						continue;
-					}
+				if (checkLocation(destination1, detectives)){
 					for (int destination2 : setup.graph.adjacentNodes(destination1)){
-						for (Player d2 : detectives){
-							if (d2.location() == destination2){
-								continue;
-							}
+						if (checkLocation(destination2, detectives)){
 							for (Transport t1 : Objects.requireNonNull(
 									setup.graph.edgeValueOrDefault(
 											source,
@@ -545,6 +543,20 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			ImmutableList<Player> remainingDetectives = ImmutableList.copyOf(newDetectives);
 			ImmutableList<LogEntry> updatedLog = ImmutableList.copyOf(newLog);
 			return new MyGameState(setup, newRemaining, updatedLog, newMrX, remainingDetectives);
+		}
+
+		public Model.Observer.Event chooseMove(@Nonnull Move move){
+			//TODO Advance the model with move, then notify all observers of what what just happened.
+			//you may want to use getWinner() to determine whether to send out Event.MOVE_MADE or Event.GAME_OVER
+
+			advance(move);
+			//notify all observers of what what just happened.
+			if(getWinner().isEmpty()) {
+				return Model.Observer.Event.MOVE_MADE;
+			}else{
+				return Model.Observer.Event.GAME_OVER;
+			}
+
 		}
 	}
 }
