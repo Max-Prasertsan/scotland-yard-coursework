@@ -127,7 +127,6 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					}
 
 				}
-
 				else if (setup.rounds.size() == current_round){
 					System.out.println("4");
 					prizeMan.add(mrX.piece());
@@ -499,9 +498,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 					if (d.has(Ticket.TAXI) || d.has(Ticket.BUS) || d.has(Ticket.UNDERGROUND)){
 						left.add(d.piece());
 					}
-					newDetectives.add(d);
 				}
-
+				newDetectives.addAll(detectives);
 			}
 			// condition for Detectives
 			else if (move.commencedBy().isDetective()){
