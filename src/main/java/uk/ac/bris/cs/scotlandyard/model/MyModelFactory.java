@@ -75,12 +75,15 @@ public final class MyModelFactory implements Factory<Model> {
 
 		@Override
 		public void chooseMove(@Nonnull Move move) {
-			if (!gameState.getWinner().isEmpty()){
-				gameState.advance(move);
-
+			gameState.advance(move);
+			for (Observer obs : observers){
+				obs.onModelChanged(gameState, Observer.Event.MOVE_MADE);
 			}
-			else{
 
+			if(!gameState.getWinner().isEmpty()){
+				for (Observer obs : observers){
+					obs.onModelChanged(gameState, Observer.Event.GAME_OVER);
+				}
 			}
 		}
 	}
