@@ -74,7 +74,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 						if (remaining.contains(d.piece())){
 							moves_detective = ImmutableSet.<Move>builder()
 									.addAll(moves_detective)
-									.addAll(ImmutableSet.copyOf(makeSingleDetectiveMoves(setup, detectives, d, mrX, d.location())))
+									.addAll(ImmutableSet.copyOf(makeSingleMoves(setup, detectives, d, d.location())))
 									.build();
 						}
 					}
@@ -203,39 +203,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			}
 			return true;
 		}
-		//--------------------------------------------------------------------------------------------------------------
-		//helper for available move
-		// DETECTIVES SINGLE MOVE
-		private static ImmutableSet<Move.SingleMove> makeSingleDetectiveMoves(
-				GameSetup setup,
-				List<Player> detectives,
-				Player player,
-				Player mrX,
-				int source){
-			final var singleMoves = new ArrayList<Move.SingleMove>();
- 			for (int destination : setup.graph.adjacentNodes(source)) {
-				// TO DO find out if destination is occupied by a detective
-				// if the location is occupied, don't add to the list of moves to return
-				if (checkLocation(destination, detectives)){
-					for (Transport t : Objects.requireNonNull(
-							setup.graph.edgeValueOrDefault(
-									source,
-									destination,
-									ImmutableSet.of()))) {
-						// TO DO find out if the player has the required tickets
-						// if it does, construct SingleMove and add it the list of moves to return
-						if (player.has(t.requiredTicket())) {
-							singleMoves.add(new Move.SingleMove(
-									player.piece(),
-									source,
-									t.requiredTicket(),
-									destination));
-						}
-					}
-				}
- 			}
-			return ImmutableSet.copyOf(singleMoves);
-		}
+
 		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
 		// MRX SINGLE MOVE

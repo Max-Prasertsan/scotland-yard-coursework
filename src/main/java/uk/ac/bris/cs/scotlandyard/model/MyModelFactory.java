@@ -7,7 +7,7 @@ import javax.management.modelmbean.ModelMBean;
 
 import com.google.common.collect.ImmutableSet;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.Factory;
-
+import uk.ac.bris.cs.scotlandyard.model.MyGameStateFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -24,9 +24,11 @@ public final class MyModelFactory implements Factory<Model> {
 	}
 
 	private static class MyModelState implements Model{
-		private HashSet<Observer> observers;
+		private ArrayList<Observer> observers;
+		private GameSetup setup;
+		private Board.GameState gameState;
 
-		public static class findObserver implements Observer {
+		public static class observer implements Observer {
 			@Override
 			public void onModelChanged(@Nonnull Board board, @Nonnull Event event) {
 
@@ -36,7 +38,7 @@ public final class MyModelFactory implements Factory<Model> {
 		@Nonnull
 		@Override
 		public Board getCurrentBoard() {
-			return null;
+			return gameState;
 		}
 
 		@Override
@@ -46,7 +48,12 @@ public final class MyModelFactory implements Factory<Model> {
 
 		@Override
 		public void unregisterObserver(@Nonnull Observer observer) {
-			observers.remove(observer);
+			if (observers.contains(observer)){
+				observers.remove(observer);
+			}
+			else{
+				throw new IllegalArgumentException("This observer is not in the list");
+			}
 		}
 
 		@Nonnull
@@ -57,7 +64,12 @@ public final class MyModelFactory implements Factory<Model> {
 
 		@Override
 		public void chooseMove(@Nonnull Move move) {
+			if (!gameState.getWinner().isEmpty()){
+				gameState.advance(move);
+			}
+			else if (gameState.getWinner() == gameState.getPlayers()){
 
+			}
 		}
 	}
 }
