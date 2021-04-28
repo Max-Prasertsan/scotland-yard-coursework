@@ -549,9 +549,9 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			//TODO Advance the model with move, then notify all observers of what what just happened.
 			//you may want to use getWinner() to determine whether to send out Event.MOVE_MADE or Event.GAME_OVER
 
-			advance(move);
+
 			//notify all observers of what what just happened.
-			if(getWinner().isEmpty()) {
+			if(advance(move).getWinner().isEmpty()) {
 				return Model.Observer.Event.MOVE_MADE;
 			}else{
 				return Model.Observer.Event.GAME_OVER;
