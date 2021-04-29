@@ -19,19 +19,13 @@ import java.util.HashSet;
 public final class MyModelFactory implements Factory<Model> {
 
 	@Nonnull @Override public Model build(GameSetup setup, Player mrX, ImmutableList<Player> detectives) {
-		return new MyModelState(setup, mrX, detectives);
+		return new MyModelState();
 	}
 
 	private static class MyModelState implements Model{
-		private GameSetup setup;
-		private Board.GameState gameState;
-		private ImmutableList<Player> everyone;
-
+		GameSetup setup;
 		ArrayList<Observer> observers = new ArrayList<>();
-		public MyModelState(GameSetup setup,
-							Player mrX,
-							ImmutableList<Player> detectives) {
-		}
+		Board.GameState gameState = new Board.MyGameState();
 
 
 		@Nonnull
@@ -58,7 +52,6 @@ public final class MyModelFactory implements Factory<Model> {
 			if (observers.contains(observer)){
 				observers.remove(observer);
 			}
-
 			else if (observer.equals(null)){
 				throw new NullPointerException("This observer is not in the list");
 			}
@@ -78,12 +71,10 @@ public final class MyModelFactory implements Factory<Model> {
 			gameState.advance(move);
 			for (Observer obs : observers){
 				obs.onModelChanged(gameState, Observer.Event.MOVE_MADE);
-			}
-
-			if(!gameState.getWinner().isEmpty()){
-				for (Observer obs : observers){
+				if(!gameState.getWinner().isEmpty()){
 					obs.onModelChanged(gameState, Observer.Event.GAME_OVER);
 				}
+
 			}
 		}
 	}
