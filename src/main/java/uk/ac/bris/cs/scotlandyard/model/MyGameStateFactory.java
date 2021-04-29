@@ -409,7 +409,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Override public GameState advance(Move move) {
 			System.out.println("Move given");
 			System.out.println(move);
-			//if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
+			if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
 
 			findMove findMoveLocation = new findMove();
 			// make copy of MrX
