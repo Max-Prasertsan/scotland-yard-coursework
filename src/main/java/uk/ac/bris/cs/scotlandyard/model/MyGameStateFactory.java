@@ -86,6 +86,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 			} else{
 				moves = ImmutableSet.copyOf(moves_mrx);
 			}
+			System.out.println("Moves >> ");
+			System.out.println(moves);
 			//----------------------------------------------------------------------------------------------------------
 			// Setting up winner
 			Set<Piece> prizeMan = new LinkedHashSet<>();
@@ -206,7 +208,7 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		//--------------------------------------------------------------------------------------------------------------
 		//helper for available move
-		// MRX SINGLE MOVE
+		// SINGLE MOVE
 		private static ImmutableSet<Move.SingleMove> makeSingleMoves(
 				GameSetup setup,
 				List<Player> detectives,
@@ -405,6 +407,8 @@ public final class MyGameStateFactory implements Factory<GameState> {
 
 		@Nonnull
 		@Override public GameState advance(Move move) {
+			System.out.println("Move given");
+			System.out.println(move);
 			if (!(moves.contains(move))) throw new IllegalArgumentException("Illegal move: " + move);
 
 			findMove findMoveLocation = new findMove();

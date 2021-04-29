@@ -19,14 +19,17 @@ import java.util.HashSet;
 public final class MyModelFactory implements Factory<Model> {
 
 	@Nonnull @Override public Model build(GameSetup setup, Player mrX, ImmutableList<Player> detectives) {
-		return new MyModelState();
+		Board.GameState gameState = new MyGameStateFactory().build(setup, mrX, detectives);
+		return new MyModelState(gameState);
 	}
 
 	private static class MyModelState implements Model{
-		GameSetup setup;
 		ArrayList<Observer> observers = new ArrayList<>();
-		Board.GameState gameState = new Board.MyGameState();
+		Board.GameState gameState;
 
+		public MyModelState(Board.GameState gameState) {
+			this.gameState = gameState;
+		}
 
 		@Nonnull
 		@Override
@@ -68,13 +71,18 @@ public final class MyModelFactory implements Factory<Model> {
 
 		@Override
 		public void chooseMove(@Nonnull Move move) {
-			gameState.advance(move);
-			for (Observer obs : observers){
-				obs.onModelChanged(gameState, Observer.Event.MOVE_MADE);
-				if(!gameState.getWinner().isEmpty()){
+			if(gameState.getWinner().isEmpty()){
+				System.out.println("Move");
+				gameState.advance(move);
+				for (Observer obs : observers){
+					obs.onModelChanged(gameState, Observer.Event.MOVE_MADE);
+				}
+			}
+			else{
+				System.out.println("Over");
+				for (Observer obs : observers){
 					obs.onModelChanged(gameState, Observer.Event.GAME_OVER);
 				}
-
 			}
 		}
 	}
