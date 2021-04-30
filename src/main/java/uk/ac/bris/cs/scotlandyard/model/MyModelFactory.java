@@ -3,12 +3,9 @@ package uk.ac.bris.cs.scotlandyard.model;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
-import javax.management.modelmbean.ModelMBean;
 
 import com.google.common.collect.ImmutableSet;
-import org.checkerframework.checker.units.qual.A;
 import uk.ac.bris.cs.scotlandyard.model.ScotlandYard.Factory;
-import uk.ac.bris.cs.scotlandyard.model.MyGameStateFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -24,9 +21,10 @@ public final class MyModelFactory implements Factory<Model> {
 	}
 
 	private static class MyModelState implements Model{
-		ArrayList<Observer> observers = new ArrayList<>();
+		HashSet<Observer> observers = new HashSet<>();
 		Board.GameState gameState;
 
+		// Constructor for model
 		public MyModelState(Board.GameState gameState) {
 			this.gameState = gameState;
 		}
@@ -45,6 +43,7 @@ public final class MyModelFactory implements Factory<Model> {
 			else if (observers.contains(observer)){
 				throw new IllegalArgumentException("Already have this observer");
 			}
+			// if not illegal or null, add the observer to the list.
 			else{
 				observers.add(observer);
 			}
@@ -52,14 +51,16 @@ public final class MyModelFactory implements Factory<Model> {
 
 		@Override
 		public void unregisterObserver(@Nonnull Observer observer) {
-			if (observers.contains(observer)){
-				observers.remove(observer);
-			}
-			else if (observer.equals(null)){
+
+			if (observer.equals(null)){
 				throw new NullPointerException("This observer is not in the list");
 			}
-			else{
+			else if (!observers.contains(observer)){
 				throw new IllegalArgumentException("this observer is illegal");
+			}
+			// if not illegal or null, remove from the list
+			else{
+				observers.remove(observer);
 			}
 		}
 
@@ -78,7 +79,6 @@ public final class MyModelFactory implements Factory<Model> {
 				}
 			}
 			else{
-				System.out.println("Over");
 				for (Observer obs : observers){
 					obs.onModelChanged(gameState, Observer.Event.GAME_OVER);
 				}
