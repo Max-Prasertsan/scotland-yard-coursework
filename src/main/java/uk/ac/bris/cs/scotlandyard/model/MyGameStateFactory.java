@@ -357,17 +357,17 @@ public final class MyGameStateFactory implements Factory<GameState> {
 		@Nonnull
 		@Override public Optional<TicketBoard> getPlayerTickets(Piece piece) {
 			for (Player p : everyone){
+				//alternative option using lambda.
 				if (p.piece() == piece){
-					//return Optional.of(ticket -> p.tickets().get(ticket));
-					// alternative option using lambda.
-					// but use normal implement instead for easier understanding.
+					return Optional.of(ticket -> p.tickets().get(ticket));
 
-					return Optional.of(new TicketBoard() {
-						@Override
-						public int getCount(@Nonnull Ticket ticket) {
-							return p.tickets().get(ticket);
-						}
-					});
+				// Here is normal implementation without lambda.
+					//return Optional.of(new TicketBoard() {
+						//@Override
+						//public int getCount(@Nonnull Ticket ticket) {
+							//return p.tickets().get(ticket);
+						//}
+					// });
 				}
 			}
 			return Optional.empty();
